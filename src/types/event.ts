@@ -1,18 +1,36 @@
-export type EventStatus = "DRAFT" | "PUBLISHED";
+export type EventStatus = "DRAFT" | "PUBLISHED" | "CANCELLED";
 
-export interface CatalogItem {
+export interface EventCatalogItemSummary {
   id: string;
-  provider: string;
   title: string;
-  genre: string;
+  imageUrl: string | null;
 }
 
-export interface OrganizerEvent {
+export interface EventCatalogItem extends EventCatalogItemSummary {
+  provider: string;
+  externalId: string;
+  type: string;
+  description: string;
+}
+
+export interface EventSummary {
   id: string;
-  catalogItem: CatalogItem;
-  date: string;
-  venue: string;
+  title: string;
+  startsAt: string;
+  location: string;
   capacity: number;
   price: number;
   status: EventStatus;
+  seatsAvailable: number;
+  catalogItem: EventCatalogItemSummary;
+  createdAt: string;
+}
+
+export interface EventDetail
+  extends Omit<EventSummary, "catalogItem" | "seatsAvailable"> {
+  organizerId: string;
+  seatsTotal: number;
+  seatsAvailable: number;
+  catalogItem: EventCatalogItem;
+  updatedAt: string;
 }

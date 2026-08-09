@@ -13,7 +13,7 @@ export class ApiError extends Error {
 }
 
 type RequestOptions = Omit<RequestInit, "body"> & {
-  body?: BodyInit | Record<string, unknown> | null;
+  body?: BodyInit | object | null;
 };
 
 function shouldSerializeBody(body: RequestOptions["body"]) {
