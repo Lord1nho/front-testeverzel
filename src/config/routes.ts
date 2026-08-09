@@ -1,5 +1,6 @@
 export const appRoutes = {
   login: "/login",
+  profile: "/profile",
   events: "/events",
   eventDetails: (id: string) => `/events/${id}`,
   checkout: (eventId: string) => `/checkout/${eventId}`,
