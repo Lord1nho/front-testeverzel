@@ -40,3 +40,25 @@ a {
 a:hover {
   color: var(--accent-lime);
 }
+
+.session-flip {
+  display: inline-grid;
+  perspective: 600px;
+}
+.session-flip-face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  transition: transform 0.4s ease;
+}
+.session-flip-front {
+  transform: rotateX(0deg);
+}
+.session-flip-back {
+  transform: rotateX(180deg);
+}
+.session-flip:hover .session-flip-front {
+  transform: rotateX(-180deg);
+}
+.session-flip:hover .session-flip-back {
+  transform: rotateX(0deg);
+}

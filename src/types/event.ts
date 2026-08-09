@@ -40,3 +40,17 @@ export interface EventDetail
   catalogItem: EventCatalogItem;
   updatedAt: string;
 }
+
+export interface PublicEventDetail extends Omit<EventSummary, "catalogItem"> {
+  seatsTotal: number;
+  catalogItem: EventCatalogItem;
+  updatedAt: string;
+}
+
+export type SeatStatus = "AVAILABLE" | "RESERVED" | "SOLD";
+
+export interface Seat {
+  id: string;
+  code: string;
+  status: SeatStatus;
+}
