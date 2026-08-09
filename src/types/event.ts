@@ -1,4 +1,6 @@
 export type EventStatus = "DRAFT" | "PUBLISHED" | "CANCELLED";
+export type SessionStatus = "SCHEDULED" | "STARTED" | "ENDED";
+export type Venue = "CINE_VERZEL_1" | "CINE_VERZEL_2";
 
 export interface EventCatalogItemSummary {
   id: string;
@@ -11,16 +13,20 @@ export interface EventCatalogItem extends EventCatalogItemSummary {
   externalId: string;
   type: string;
   description: string;
+  durationMinutes: number | null;
 }
 
 export interface EventSummary {
   id: string;
   title: string;
   startsAt: string;
-  location: string;
+  venue: Venue;
+  room: number;
   capacity: number;
   price: number;
   status: EventStatus;
+  sessionStatus: SessionStatus;
+  sessionEndsAt: string;
   seatsAvailable: number;
   catalogItem: EventCatalogItemSummary;
   createdAt: string;

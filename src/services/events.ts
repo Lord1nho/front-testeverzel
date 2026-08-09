@@ -1,11 +1,12 @@
 import { apiClient } from "@/lib/api-client";
-import type { EventDetail, EventSummary } from "@/types/event";
+import type { EventDetail, EventSummary, Venue } from "@/types/event";
 
 export interface CreateEventInput {
   tmdbId: number;
   title?: string;
   startsAt: string;
-  location: string;
+  venue: Venue;
+  room: number;
   capacity: number;
   price: number;
 }
@@ -13,7 +14,8 @@ export interface CreateEventInput {
 export interface UpdateEventInput {
   title?: string;
   startsAt?: string;
-  location?: string;
+  venue?: Venue;
+  room?: number;
   capacity?: number;
   price?: number;
 }

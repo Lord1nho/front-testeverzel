@@ -6,22 +6,25 @@ import { useEffect, useState } from "react";
 import { appRoutes } from "@/config/routes";
 import { ApiError } from "@/lib/api-client";
 import { formatCurrency, formatEventDate } from "@/lib/format";
+import { venueLabels } from "@/lib/venue";
 import { logout } from "@/services/auth";
 import { listEvents } from "@/services/events";
 import type { EventSummary } from "@/types/event";
 
 function getStatusLabel(
   event: EventSummary,
-  now: number,
-): "Publicado" | "Rascunho" | "Encerrado" | "Cancelado" {
+): "Publicado" | "Rascunho" | "Em andamento" | "Encerrado" | "Cancelado" {
   if (event.status === "CANCELLED") return "Cancelado";
   if (event.status === "DRAFT") return "Rascunho";
-  return new Date(event.startsAt).getTime() < now ? "Encerrado" : "Publicado";
+  if (event.sessionStatus === "STARTED") return "Em andamento";
+  if (event.sessionStatus === "ENDED") return "Encerrado";
+  return "Publicado";
 }
 
 const statusClassName: Record<string, string> = {
   Publicado: "bg-accent-green text-[#05070a]",
   Rascunho: "bg-surface-2 text-foreground",
+  "Em andamento": "bg-accent-cyan text-[#05070a]",
   Encerrado: "border border-border text-text-mute",
   Cancelado: "border border-red-500/30 text-red-400",
 };
@@ -101,7 +104,7 @@ export default function OrganizerEventsPage() {
           <div className="grid grid-cols-[2fr_1fr_1.4fr_1fr_1fr_1fr_0.8fr] gap-2 border-b border-border bg-surface px-5 py-3.5 text-xs font-semibold text-text-mute">
             <span>Evento</span>
             <span>Data</span>
-            <span>Local</span>
+            <span>Cinema / Sala</span>
             <span>Capacidade</span>
             <span>Preço</span>
             <span>Status</span>
@@ -109,7 +112,7 @@ export default function OrganizerEventsPage() {
           </div>
 
           {events.map((event) => {
-            const statusLabel = getStatusLabel(event, now);
+            const statusLabel = getStatusLabel(event);
             const editable = new Date(event.startsAt).getTime() > now;
 
             return (
@@ -123,7 +126,9 @@ export default function OrganizerEventsPage() {
                 <span className="text-text-dim">
                   {formatEventDate(event.startsAt)}
                 </span>
-                <span className="text-text-dim">{event.location}</span>
+                <span className="text-text-dim">
+                  {venueLabels[event.venue]} · Sala {event.room}
+                </span>
                 <span className="text-text-dim">
                   {event.seatsAvailable} / {event.capacity}
                 </span>

@@ -20,8 +20,9 @@ import {
   type CreateEventInput,
   type UpdateEventInput,
 } from "@/services/events";
+import { venueLabels, venueOptions } from "@/lib/venue";
 import type { MovieDetails, MovieSummary } from "@/types/catalog";
-import type { EventDetail } from "@/types/event";
+import type { EventDetail, Venue } from "@/types/event";
 
 const inputClassName =
   "w-full rounded-[9px] border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none placeholder:text-text-dim focus:border-accent-cyan";
@@ -48,7 +49,8 @@ export function EventForm({ eventId }: EventFormProps) {
 
   const [title, setTitle] = useState("");
   const [startsAtLocal, setStartsAtLocal] = useState("");
-  const [location, setLocation] = useState("");
+  const [venue, setVenue] = useState<Venue | "">("");
+  const [room, setRoom] = useState("");
   const [capacity, setCapacity] = useState("");
   const [price, setPrice] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +64,8 @@ export function EventForm({ eventId }: EventFormProps) {
         setLocked(new Date(loaded.startsAt).getTime() < Date.now());
         setTitle(loaded.title);
         setStartsAtLocal(toDateTimeLocalValue(loaded.startsAt));
-        setLocation(loaded.location);
+        setVenue(loaded.venue);
+        setRoom(String(loaded.room));
         setCapacity(String(loaded.capacity));
         setPrice(String(loaded.price));
       })
@@ -116,7 +119,11 @@ export function EventForm({ eventId }: EventFormProps) {
     if (new Date(fromDateTimeLocalValue(startsAtLocal)).getTime() <= Date.now()) {
       return "A data do evento precisa ser no futuro.";
     }
-    if (!location.trim()) return "Informe o local do evento.";
+    if (!venue) return "Selecione o cinema (Cine Verzel 1 ou 2).";
+    const roomNumber = Number(room);
+    if (!Number.isInteger(roomNumber) || roomNumber < 1 || roomNumber > 4) {
+      return "Número da sala deve ser entre 1 e 4.";
+    }
     const capacityNumber = Number(capacity);
     if (!Number.isFinite(capacityNumber) || capacityNumber <= 0) {
       return "Capacidade deve ser maior que zero.";
@@ -134,7 +141,8 @@ export function EventForm({ eventId }: EventFormProps) {
       tmdbId: selectedMovie!.tmdbId,
       title: title.trim() || undefined,
       startsAt: fromDateTimeLocalValue(startsAtLocal),
-      location: location.trim(),
+      venue: venue as Venue,
+      room: Number(room),
       capacity: Number(capacity),
       price: Number(price),
     };
@@ -181,7 +189,8 @@ export function EventForm({ eventId }: EventFormProps) {
       const input: UpdateEventInput = {
         title: title.trim() || undefined,
         startsAt: fromDateTimeLocalValue(startsAtLocal),
-        location: location.trim(),
+        venue: venue as Venue,
+        room: Number(room),
         price: Number(price),
       };
       if (event.status === "DRAFT") {
@@ -287,6 +296,11 @@ export function EventForm({ eventId }: EventFormProps) {
               </div>
               <div>
                 <span className="block text-sm font-semibold">{reviewTitle}</span>
+                <span className="block text-xs text-text-mute">
+                  {event?.catalogItem.durationMinutes
+                    ? `${event.catalogItem.durationMinutes} min`
+                    : "Duração não informada pela TMDB"}
+                </span>
                 <span className="text-xs text-text-mute">
                   O filme não pode ser trocado depois que o evento é criado.
                 </span>
@@ -383,14 +397,37 @@ export function EventForm({ eventId }: EventFormProps) {
           </div>
           <div>
             <label className="mb-1.5 block text-xs text-text-mute">
-              Local
+              Cinema
             </label>
-            <input
-              value={location}
-              onChange={(event) => setLocation(event.target.value)}
-              placeholder="Cine Verzel - Sala 3"
+            <select
+              value={venue}
+              onChange={(event) => setVenue(event.target.value as Venue)}
               className={inputClassName}
-            />
+            >
+              <option value="">Selecione...</option>
+              {venueOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs text-text-mute">
+              Sala (1 a 4)
+            </label>
+            <select
+              value={room}
+              onChange={(event) => setRoom(event.target.value)}
+              className={inputClassName}
+            >
+              <option value="">Selecione...</option>
+              {[1, 2, 3, 4].map((number) => (
+                <option key={number} value={number}>
+                  Sala {number}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="mb-1.5 block text-xs text-text-mute">
@@ -437,7 +474,7 @@ export function EventForm({ eventId }: EventFormProps) {
               {title.trim() || reviewTitle}
             </span>
             <span className="mb-4 block text-xs text-text-mute">
-              {location || "Local não definido"}
+              {venue ? `${venueLabels[venue]} · Sala ${room || "?"}` : "Cinema não definido"}
               {startsAtLocal
                 ? ` · ${new Date(fromDateTimeLocalValue(startsAtLocal)).toLocaleString("pt-BR")}`
                 : ""}
