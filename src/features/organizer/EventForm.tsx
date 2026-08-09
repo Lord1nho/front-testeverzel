@@ -29,9 +29,10 @@ const inputClassName =
 
 interface EventFormProps {
   eventId?: string;
+  initialError?: string;
 }
 
-export function EventForm({ eventId }: EventFormProps) {
+export function EventForm({ eventId, initialError }: EventFormProps) {
   const router = useRouter();
   const isEditMode = Boolean(eventId);
 
@@ -53,7 +54,7 @@ export function EventForm({ eventId }: EventFormProps) {
   const [room, setRoom] = useState("");
   const [capacity, setCapacity] = useState("");
   const [price, setPrice] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError ?? null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -161,17 +162,34 @@ export function EventForm({ eventId }: EventFormProps) {
 
     setSubmitting(true);
     setError(null);
+
+    let created: EventDetail;
     try {
-      const { event: created } = await createEvent(buildCreateInput());
-      if (publishAfter) {
-        await publishEvent(created.id);
-      }
-      router.push(appRoutes.organizerEvents);
+      ({ event: created } = await createEvent(buildCreateInput()));
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : "Não foi possível criar o evento.",
       );
       setSubmitting(false);
+      return;
+    }
+
+    if (!publishAfter) {
+      router.push(appRoutes.organizerEvents);
+      return;
+    }
+
+    try {
+      await publishEvent(created.id);
+      router.push(appRoutes.organizerEvents);
+    } catch (err) {
+      // O evento já foi criado (como rascunho) nesse ponto — manda pra edição
+      // dele em vez de deixar o usuário tentar de novo e criar um duplicado.
+      const message =
+        err instanceof ApiError ? err.message : "Não foi possível publicar o evento.";
+      router.push(
+        `${appRoutes.organizerEventDetails(created.id)}?publishError=${encodeURIComponent(message)}`,
+      );
     }
   }
 
