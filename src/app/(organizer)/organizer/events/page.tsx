@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { appRoutes } from "@/config/routes";
 import { ApiError } from "@/lib/api-client";
-import { formatCurrency, formatEventDate } from "@/lib/format";
+import { formatCurrency, formatEventDateTime } from "@/lib/format";
 import { venueLabels } from "@/lib/venue";
 import { logout } from "@/services/auth";
 import { listEvents } from "@/services/events";
@@ -101,7 +101,7 @@ export default function OrganizerEventsPage() {
 
       {events && now !== null && (
         <div className="overflow-hidden rounded-xl border border-border">
-          <div className="grid grid-cols-[2fr_1fr_1.4fr_1fr_1fr_1fr_0.8fr] gap-2 border-b border-border bg-surface px-5 py-3.5 text-xs font-semibold text-text-mute">
+          <div className="grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] gap-2 border-b border-border bg-surface px-5 py-3.5 text-xs font-semibold text-text-mute">
             <span>Evento</span>
             <span>Data</span>
             <span>Cinema / Sala</span>
@@ -118,13 +118,13 @@ export default function OrganizerEventsPage() {
             return (
               <div
                 key={event.id}
-                className={`grid grid-cols-[2fr_1fr_1.4fr_1fr_1fr_1fr_0.8fr] items-center gap-2 border-b border-border px-5 py-4 text-sm last:border-b-0 ${
+                className={`grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] items-center gap-2 border-b border-border px-5 py-4 text-sm last:border-b-0 ${
                   editable ? "" : "opacity-55"
                 }`}
               >
                 <span className="font-semibold">{event.title}</span>
                 <span className="text-text-dim">
-                  {formatEventDate(event.startsAt)}
+                  {formatEventDateTime(event.startsAt)}
                 </span>
                 <span className="text-text-dim">
                   {venueLabels[event.venue]} · Sala {event.room}
