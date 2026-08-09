@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { appRoutes } from "@/config/routes";
+import { roleHomeRoute } from "@/config/routes";
 import { ApiError } from "@/lib/api-client";
 import { login } from "@/services/auth";
 
@@ -20,8 +20,8 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
-      router.push(appRoutes.profile);
+      const { user } = await login(email, password);
+      router.push(roleHomeRoute(user.role));
     } catch (err) {
       setError(
         err instanceof ApiError

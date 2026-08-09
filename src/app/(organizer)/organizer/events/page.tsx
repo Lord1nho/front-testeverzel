@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { appRoutes } from "@/config/routes";
 import { ApiError } from "@/lib/api-client";
 import { formatCurrency, formatEventDate } from "@/lib/format";
+import { logout } from "@/services/auth";
 import { listEvents } from "@/services/events";
 import type { EventSummary } from "@/types/event";
 
@@ -25,9 +27,15 @@ const statusClassName: Record<string, string> = {
 };
 
 export default function OrganizerEventsPage() {
+  const router = useRouter();
   const [events, setEvents] = useState<EventSummary[] | null>(null);
   const [now, setNow] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleLogout() {
+    await logout().catch(() => {});
+    router.push(appRoutes.login);
+  }
 
   useEffect(() => {
     listEvents()
@@ -57,12 +65,27 @@ export default function OrganizerEventsPage() {
             <span>Relatórios</span>
           </nav>
         </div>
-        <Link
-          href={appRoutes.organizerEventNew}
-          className="rounded-lg bg-accent-lime px-4.5 py-2.5 text-sm font-bold text-[#05070a] hover:brightness-95"
-        >
-          + Novo evento
-        </Link>
+        <div className="flex items-center gap-5">
+          <Link
+            href={appRoutes.profile}
+            className="text-sm text-text-dim hover:text-foreground"
+          >
+            Perfil
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="text-sm text-text-dim hover:text-foreground"
+          >
+            Sair
+          </button>
+          <Link
+            href={appRoutes.organizerEventNew}
+            className="rounded-lg bg-accent-lime px-4.5 py-2.5 text-sm font-bold text-[#05070a] hover:brightness-95"
+          >
+            + Novo evento
+          </Link>
+        </div>
       </div>
 
       <h1 className="mb-5 font-heading text-2xl font-bold">Meus eventos</h1>

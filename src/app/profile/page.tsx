@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { appRoutes } from "@/config/routes";
@@ -11,6 +12,11 @@ const roleLabels: Record<UserRole, string> = {
   CUSTOMER: "Cliente",
   ORGANIZER: "Organizador",
   GATE: "Portaria",
+};
+
+const roleAreaLink: Partial<Record<UserRole, { href: string; label: string }>> = {
+  ORGANIZER: { href: appRoutes.organizerEvents, label: "Ir para meus eventos" },
+  CUSTOMER: { href: appRoutes.events, label: "Ver eventos" },
 };
 
 function getInitials(name: string) {
@@ -88,6 +94,15 @@ export default function ProfilePage() {
             <span className="text-xs text-text-mute">Membro desde</span>
           </div>
         </div>
+
+        {roleAreaLink[user.role] && (
+          <Link
+            href={roleAreaLink[user.role]!.href}
+            className="mb-2.5 block w-full rounded-xl border border-border bg-surface px-[18px] py-4 text-sm font-semibold text-accent-lime hover:bg-surface-2"
+          >
+            {roleAreaLink[user.role]!.label}
+          </Link>
+        )}
 
         <button
           type="button"
