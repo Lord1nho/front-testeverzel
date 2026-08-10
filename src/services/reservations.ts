@@ -13,3 +13,7 @@ export function createReservation(input: CreateReservationInput) {
 export function getReservation(id: string) {
   return apiClient.get<{ reservation: Reservation }>(`/api/reservations/${id}`);
 }
+
+export function cancelReservation(id: string) {
+  return apiClient.post<{ reservation: Reservation }>(`/api/reservations/${id}/cancel`);
+}

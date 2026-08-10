@@ -1,6 +1,12 @@
 import type { Venue } from "@/types/event";
+import type { TicketStatus } from "@/types/ticket";
 
-export type ReservationStatus = "PENDING_PAYMENT";
+export type ReservationStatus =
+  | "PENDING_PAYMENT"
+  | "PAID"
+  | "PAYMENT_DECLINED"
+  | "CANCELLED"
+  | "EXPIRED";
 
 export interface ReservationSeat {
   id: string;
@@ -15,6 +21,12 @@ export interface ReservationEventSummary {
   room: number;
 }
 
+export interface ReservationTicket {
+  id: string;
+  code: string;
+  status: TicketStatus;
+}
+
 export interface Reservation {
   id: string;
   status: ReservationStatus;
@@ -24,4 +36,5 @@ export interface Reservation {
   createdAt: string;
   event: ReservationEventSummary;
   seats: ReservationSeat[];
+  tickets: ReservationTicket[];
 }

@@ -1,18 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { appRoutes } from "@/config/routes";
 import { ApiError } from "@/lib/api-client";
 import { formatCurrency, formatEventDateTime } from "@/lib/format";
 import { venueLabels } from "@/lib/venue";
 import { CheckoutSummary } from "@/features/checkout/CheckoutSummary";
+import { PaymentForm } from "@/features/checkout/PaymentForm";
+import { PaymentOutcome } from "@/features/checkout/PaymentOutcome";
 import { SeatMap } from "@/features/checkout/SeatMap";
 import { getMe } from "@/services/auth";
 import { getEventSeats, getPublishedEvent } from "@/services/public-events";
-import { createReservation } from "@/services/reservations";
+import { createPayment } from "@/services/payments";
+import { cancelReservation, createReservation } from "@/services/reservations";
 import type { PublicEventDetail, Seat } from "@/types/event";
+import type { CardInput, PaymentResult } from "@/types/payment";
 import type { Reservation } from "@/types/reservation";
 
 const MAX_SEATS = 10;
@@ -21,6 +25,7 @@ type AuthState = "loading" | "guest" | "wrong-role" | "customer";
 
 export default function CheckoutPage() {
   const params = useParams<{ eventId: string }>();
+  const router = useRouter();
   const eventId = params.eventId;
 
   const [authState, setAuthState] = useState<AuthState>("loading");
@@ -32,6 +37,13 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [reservation, setReservation] = useState<Reservation | null>(null);
+
+  const [paying, setPaying] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
 
   const loadSeats = useCallback(() => {
     return getEventSeats(eventId).then((data) => setSeats(data.seats));
@@ -108,6 +120,68 @@ export default function CheckoutPage() {
     }
   }
 
+  async function handlePay(card: CardInput) {
+    if (!reservation) return;
+
+    setPaying(true);
+    setPaymentError(null);
+    setSessionExpired(false);
+
+    try {
+      const result = await createPayment({ reservationId: reservation.id, card });
+      setPaymentResult(result);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        setSessionExpired(true);
+        setPaymentError("Sua sessão expirou. Entre novamente para continuar.");
+      } else if (err instanceof ApiError && err.status === 409) {
+        setPaymentError(
+          "Este pagamento já foi processado em outra tentativa. Confira em Meus ingressos.",
+        );
+      } else {
+        setPaymentError(
+          err instanceof ApiError ? err.message : "Não foi possível processar o pagamento.",
+        );
+      }
+    } finally {
+      setPaying(false);
+    }
+  }
+
+  async function handleCancel() {
+    if (!reservation) return;
+
+    setCancelling(true);
+    setPaymentError(null);
+    try {
+      await cancelReservation(reservation.id);
+      setCancelled(true);
+    } catch (err) {
+      setPaymentError(
+        err instanceof ApiError ? err.message : "Não foi possível cancelar a reserva.",
+      );
+    } finally {
+      setCancelling(false);
+    }
+  }
+
+  async function handleBackFromPayment() {
+    if (reservation) {
+      await cancelReservation(reservation.id).catch(() => {});
+    }
+    router.push(appRoutes.eventDetails(eventId));
+  }
+
+  function resetToSelection() {
+    setReservation(null);
+    setPaymentResult(null);
+    setPaymentError(null);
+    setSessionExpired(false);
+    setCancelled(false);
+    setSelectedIds([]);
+    loadSeats().catch(() => {});
+  }
+
   if (notFound) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
@@ -138,45 +212,99 @@ export default function CheckoutPage() {
     );
   }
 
-  if (reservation) {
+  if (reservation && cancelled) {
     return (
       <main className="flex min-h-dvh items-center justify-center px-6 py-16">
         <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-7 text-center">
-          <span className="mb-4 inline-block rounded-md bg-accent-cyan px-3 py-1 text-xs font-bold text-[#05070a]">
-            Aguardando pagamento
-          </span>
-          <h1 className="mb-2 font-heading text-xl font-bold">Reserva confirmada</h1>
+          <h1 className="mb-2 font-heading text-xl font-bold">Reserva cancelada</h1>
           <p className="mb-6 text-sm text-text-dim">
-            Seus assentos ficam bloqueados para você. O pagamento ainda não está
-            disponível nesta versão — assim que ele for liberado, você poderá
-            concluir a compra e emitir o ingresso.
+            Seus assentos foram liberados e já estão disponíveis para outros clientes.
           </p>
+          <Link
+            href={appRoutes.eventDetails(event.id)}
+            className="block w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95"
+          >
+            Voltar para o evento
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
-          <div className="mb-6 rounded-xl border border-border bg-surface-2 p-4 text-left text-sm">
-            <div className="mb-2 flex justify-between">
+  if (reservation && paymentResult) {
+    return (
+      <main className="flex min-h-dvh items-center justify-center px-6 py-16">
+        <PaymentOutcome
+          payment={paymentResult.payment}
+          tickets={paymentResult.tickets}
+          eventTitle={reservation.event.title}
+          onRetry={resetToSelection}
+        />
+      </main>
+    );
+  }
+
+  if (reservation) {
+    return (
+      <main className="min-h-dvh px-10 py-10">
+        <button
+          type="button"
+          onClick={handleBackFromPayment}
+          className="mb-8 inline-block text-sm text-text-dim hover:text-foreground"
+        >
+          ← Voltar para o evento
+        </button>
+
+        <h1 className="mb-1 font-heading text-2xl font-bold">Pagamento</h1>
+        <p className="mb-8 text-sm text-text-dim">
+          Confirme os dados do cartão para emitir seu ingresso.
+        </p>
+
+        {sessionExpired && (
+          <p className="mb-6 max-w-xl rounded-[9px] border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+            Sua sessão expirou.{" "}
+            <Link href={appRoutes.login} className="font-semibold text-accent-cyan hover:text-accent-lime">
+              Entrar novamente
+            </Link>
+          </p>
+        )}
+
+        <div className="flex flex-col gap-8 lg:flex-row">
+          <PaymentForm
+            totalAmount={reservation.totalAmount}
+            submitting={paying}
+            error={paymentError}
+            onSubmit={handlePay}
+          />
+
+          <div className="w-80 flex-none self-start rounded-2xl border border-border bg-surface p-6">
+            <h3 className="mb-4 font-heading text-base font-semibold">Resumo do pedido</h3>
+            <div className="mb-2 flex justify-between text-sm">
               <span className="text-text-mute">Evento</span>
               <span className="font-semibold">{reservation.event.title}</span>
             </div>
-            <div className="mb-2 flex justify-between">
+            <div className="mb-2 flex justify-between text-sm">
               <span className="text-text-mute">Assentos</span>
               <span className="font-semibold">
                 {reservation.seats.map((seat) => seat.code).join(", ")}
               </span>
             </div>
-            <div className="flex justify-between">
+            <div className="mb-4 flex justify-between text-sm">
               <span className="text-text-mute">Total</span>
               <span className="font-semibold text-accent-lime">
                 {formatCurrency(reservation.totalAmount)}
               </span>
             </div>
+            <div className="mb-4 h-px bg-border" />
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={cancelling}
+              className="text-sm text-text-dim hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {cancelling ? "Cancelando..." : "Cancelar reserva"}
+            </button>
           </div>
-
-          <Link
-            href={appRoutes.events}
-            className="block w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95"
-          >
-            Voltar para eventos
-          </Link>
         </div>
       </main>
     );

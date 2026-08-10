@@ -14,9 +14,12 @@ const roleLabels: Record<UserRole, string> = {
   GATE: "Portaria",
 };
 
-const roleAreaLink: Partial<Record<UserRole, { href: string; label: string }>> = {
-  ORGANIZER: { href: appRoutes.organizerEvents, label: "Ir para meus eventos" },
-  CUSTOMER: { href: appRoutes.events, label: "Ver eventos" },
+const roleAreaLinks: Partial<Record<UserRole, { href: string; label: string }[]>> = {
+  ORGANIZER: [{ href: appRoutes.organizerEvents, label: "Ir para meus eventos" }],
+  CUSTOMER: [
+    { href: appRoutes.events, label: "Ver eventos" },
+    { href: appRoutes.myTickets, label: "Meus ingressos" },
+  ],
 };
 
 function getInitials(name: string) {
@@ -95,14 +98,15 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {roleAreaLink[user.role] && (
+        {roleAreaLinks[user.role]?.map((link) => (
           <Link
-            href={roleAreaLink[user.role]!.href}
+            key={link.href}
+            href={link.href}
             className="mb-2.5 block w-full rounded-xl border border-border bg-surface px-[18px] py-4 text-sm font-semibold text-accent-lime hover:bg-surface-2"
           >
-            {roleAreaLink[user.role]!.label}
+            {link.label}
           </Link>
-        )}
+        ))}
 
         <button
           type="button"
