@@ -20,6 +20,7 @@ const roleAreaLinks: Partial<Record<UserRole, { href: string; label: string }[]>
     { href: appRoutes.events, label: "Ver eventos" },
     { href: appRoutes.myTickets, label: "Meus ingressos" },
   ],
+  GATE: [{ href: appRoutes.gate, label: "Ir para validação de ingressos" }],
 };
 
 function getInitials(name: string) {

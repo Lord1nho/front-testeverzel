@@ -22,6 +22,6 @@ export function roleHomeRoute(role: UserRole): string {
     case "CUSTOMER":
       return appRoutes.events;
     case "GATE":
-      return appRoutes.profile;
+      return appRoutes.gate;
   }
 }
