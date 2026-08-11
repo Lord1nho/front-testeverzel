@@ -10,7 +10,7 @@ import { ApiError } from "@/lib/api-client";
 import { formatEventDateTime } from "@/lib/format";
 import { venueLabels } from "@/lib/venue";
 import { getMe, logout } from "@/services/auth";
-import { validateTicket } from "@/services/gate";
+import { findTicketEvent, validateTicket } from "@/services/gate";
 import { listPublishedEvents } from "@/services/public-events";
 import type { EventSummary } from "@/types/event";
 import type { GateValidationResponse } from "@/types/gate";
@@ -41,14 +41,7 @@ export default function GatePage() {
     if (authState !== "gate") return;
 
     listPublishedEvents()
-      .then((data) => {
-        setEvents(data.events);
-        const started = data.events.find((event) => event.sessionStatus === "STARTED");
-        const nextScheduled = [...data.events]
-          .filter((event) => event.sessionStatus === "SCHEDULED")
-          .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())[0];
-        setSelectedEventId((started ?? nextScheduled)?.id ?? "");
-      })
+      .then((data) => setEvents(data.events))
       .catch(() => {});
   }, [authState]);
 
@@ -58,13 +51,32 @@ export default function GatePage() {
   }
 
   async function handleValidate(submittedCode: string) {
-    if (!selectedEventId) return;
-
     setSubmitting(true);
     setFormError(null);
 
     try {
-      const response = await validateTicket({ eventId: selectedEventId, code: submittedCode });
+      let eventId = selectedEventId;
+
+      if (!eventId) {
+        // Primeira leitura sem evento escolhido: descobre o evento pelo
+        // próprio código, em vez de obrigar o porteiro a escolher num
+        // dropdown antes de começar a validar.
+        const resolved = await findTicketEvent(submittedCode).catch((err) => {
+          if (err instanceof ApiError && err.status === 404) return null;
+          throw err;
+        });
+
+        if (!resolved) {
+          setResult({ result: "INVALID", ticket: null });
+          setCode("");
+          return;
+        }
+
+        eventId = resolved.event.id;
+        setSelectedEventId(eventId);
+      }
+
+      const response = await validateTicket({ eventId, code: submittedCode });
       setResult(response);
       setCode("");
     } catch (err) {
@@ -151,9 +163,12 @@ export default function GatePage() {
               id="gate-event"
               value={selectedEventId}
               onChange={(event) => setSelectedEventId(event.target.value)}
-              className={selectClassName}
+              disabled={!events}
+              className={`${selectClassName} disabled:opacity-50`}
             >
-              {!events && <option value="">Carregando eventos...</option>}
+              <option value="">
+                {events ? "Detectar automaticamente pela leitura" : "Carregando eventos..."}
+              </option>
               {events?.map((event) => (
                 <option key={event.id} value={event.id}>
                   {event.title} — {venueLabels[event.venue]} · {formatEventDateTime(event.startsAt)}
