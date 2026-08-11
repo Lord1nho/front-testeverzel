@@ -173,7 +173,7 @@ export default function OrganizerEventsPage() {
                 </span>
                 {tab === "all" ? (
                   <Link
-                    href={appRoutes.eventDetails(event.id)}
+                    href={appRoutes.checkout(event.id)}
                     className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
                   >
                     Ver
