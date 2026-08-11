@@ -8,17 +8,24 @@ import { QrTicket } from "@/features/tickets/QrTicket";
 import { TicketDetailCard } from "@/features/tickets/TicketDetailCard";
 import { ApiError } from "@/lib/api-client";
 import { getPublicTicket } from "@/services/public-tickets";
+import { getPublishedEvent } from "@/services/public-events";
 import type { TicketDetail } from "@/types/ticket";
 
 export default function SharedTicketPage() {
   const params = useParams<{ token: string }>();
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
+  const [posterUrl, setPosterUrl] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getPublicTicket(params.token)
-      .then((data) => setTicket(data.ticket))
+      .then((data) => {
+        setTicket(data.ticket);
+        getPublishedEvent(data.ticket.event.id)
+          .then((eventData) => setPosterUrl(eventData.event.catalogItem.imageUrl))
+          .catch(() => {});
+      })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 404) {
           setNotFound(true);
@@ -71,7 +78,7 @@ export default function SharedTicketPage() {
           <QrTicket qrValue={ticket.qrValue} />
         </div>
 
-        <TicketDetailCard ticket={ticket} />
+        <TicketDetailCard ticket={ticket} posterUrl={posterUrl} />
       </div>
     </main>
   );
