@@ -11,21 +11,15 @@ import { formatEventDateTime } from "@/lib/format";
 import { venueLabels } from "@/lib/venue";
 import { getMe, logout } from "@/services/auth";
 import { findTicketEvent, validateTicket } from "@/services/gate";
-import { listPublishedEvents } from "@/services/public-events";
-import type { EventSummary } from "@/types/event";
-import type { GateValidationResponse } from "@/types/gate";
-
-const selectClassName =
-  "w-full rounded-[9px] border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-accent-cyan";
+import type { GateEventLookup, GateValidationResponse } from "@/types/gate";
 
 type AuthState = "loading" | "guest" | "wrong-role" | "gate";
 
 export default function GatePage() {
   const router = useRouter();
   const [authState, setAuthState] = useState<AuthState>("loading");
-  const [events, setEvents] = useState<EventSummary[] | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<string>("");
   const [code, setCode] = useState("");
+  const [resolvedEvent, setResolvedEvent] = useState<GateEventLookup | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [result, setResult] = useState<GateValidationResponse | null>(null);
@@ -37,63 +31,78 @@ export default function GatePage() {
       .catch(() => setAuthState("guest"));
   }, []);
 
-  useEffect(() => {
-    if (authState !== "gate") return;
-
-    listPublishedEvents()
-      .then((data) => setEvents(data.events))
-      .catch(() => {});
-  }, [authState]);
-
   async function handleLogout() {
     await logout().catch(() => {});
     router.push(appRoutes.login);
   }
 
-  async function handleValidate(submittedCode: string) {
+  function handleAuthOrGenericError(err: unknown, fallback: string) {
+    if (err instanceof ApiError && err.status === 401) {
+      setAuthState("guest");
+      setFormError("Sua sessão expirou. Entre novamente para continuar.");
+    } else if (err instanceof ApiError && err.status === 403) {
+      setAuthState("wrong-role");
+    } else {
+      setFormError(err instanceof ApiError ? err.message : fallback);
+    }
+  }
+
+  // Etapa 1: ler ou digitar o código só descobre a sessão a que ele
+  // pertence — ainda não consome o ingresso (findTicketEvent é leitura
+  // pura no backend). O porteiro confere a sessão exibida antes de
+  // confirmar a entrada na etapa 2.
+  async function handleLookup(submittedCode: string) {
+    setSubmitting(true);
+    setFormError(null);
+    setResult(null);
+
+    try {
+      const resolved = await findTicketEvent(submittedCode).catch((err) => {
+        if (err instanceof ApiError && err.status === 404) return null;
+        throw err;
+      });
+
+      if (!resolved) {
+        setResult({ result: "INVALID", ticket: null });
+        setCode("");
+        return;
+      }
+
+      setResolvedEvent(resolved.event);
+      setCode(submittedCode);
+    } catch (err) {
+      handleAuthOrGenericError(err, "Não foi possível buscar o ingresso.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // Etapa 2: só aqui o ingresso é de fato validado (e marcado como
+  // utilizado, se válido).
+  async function handleConfirmValidate() {
+    if (!resolvedEvent) return;
+
     setSubmitting(true);
     setFormError(null);
 
     try {
-      let eventId = selectedEventId;
-
-      if (!eventId) {
-        // Primeira leitura sem evento escolhido: descobre o evento pelo
-        // próprio código, em vez de obrigar o porteiro a escolher num
-        // dropdown antes de começar a validar.
-        const resolved = await findTicketEvent(submittedCode).catch((err) => {
-          if (err instanceof ApiError && err.status === 404) return null;
-          throw err;
-        });
-
-        if (!resolved) {
-          setResult({ result: "INVALID", ticket: null });
-          setCode("");
-          return;
-        }
-
-        eventId = resolved.event.id;
-        setSelectedEventId(eventId);
-      }
-
-      const response = await validateTicket({ eventId, code: submittedCode });
+      const response = await validateTicket({ eventId: resolvedEvent.id, code });
       setResult(response);
+      setResolvedEvent(null);
       setCode("");
     } catch (err) {
-      if (err instanceof ApiError && err.status === 401) {
-        setAuthState("guest");
-        setFormError("Sua sessão expirou. Entre novamente para continuar.");
-      } else if (err instanceof ApiError && err.status === 403) {
-        setAuthState("wrong-role");
-      } else {
-        setFormError(
-          err instanceof ApiError ? err.message : "Não foi possível validar o ingresso.",
-        );
-      }
+      handleAuthOrGenericError(err, "Não foi possível validar o ingresso.");
     } finally {
       setSubmitting(false);
       inputRef.current?.focus();
     }
+  }
+
+  function handleCancelLookup() {
+    setResolvedEvent(null);
+    setCode("");
+    setFormError(null);
+    inputRef.current?.focus();
   }
 
   if (authState === "loading") {
@@ -126,8 +135,6 @@ export default function GatePage() {
     );
   }
 
-  const selectedEvent = events?.find((event) => event.id === selectedEventId) ?? null;
-
   return (
     <main className="min-h-dvh px-10 py-10">
       <div className="mb-8 flex items-center justify-between border-b border-border pb-5">
@@ -137,55 +144,58 @@ export default function GatePage() {
           </span>
           <span className="text-xs font-medium text-text-mute">Portaria</span>
         </div>
-        <div className="flex items-center gap-5 text-sm text-text-dim">
-          {selectedEvent && (
-            <span>
-              {selectedEvent.title} · {formatEventDateTime(selectedEvent.startsAt)}
-            </span>
-          )}
-          <button type="button" onClick={handleLogout} className="hover:text-foreground">
-            Sair
-          </button>
-        </div>
+        <button type="button" onClick={handleLogout} className="text-sm text-text-dim hover:text-foreground">
+          Sair
+        </button>
       </div>
 
       <div className="mx-auto flex max-w-md flex-col gap-5">
-        <div>
-          <label htmlFor="gate-event" className="mb-1.5 block text-xs text-text-mute">
-            Evento em operação
-          </label>
-          {events && events.length === 0 ? (
-            <p className="rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text-dim">
-              Nenhum evento publicado no momento.
-            </p>
-          ) : (
-            <select
-              id="gate-event"
-              value={selectedEventId}
-              onChange={(event) => setSelectedEventId(event.target.value)}
-              disabled={!events}
-              className={`${selectClassName} disabled:opacity-50`}
-            >
-              <option value="">
-                {events ? "Detectar automaticamente pela leitura" : "Carregando eventos..."}
-              </option>
-              {events?.map((event) => (
-                <option key={event.id} value={event.id}>
-                  {event.title} — {venueLabels[event.venue]} · {formatEventDateTime(event.startsAt)}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+        {resolvedEvent ? (
+          <div className="rounded-2xl border border-border bg-surface p-6">
+            <span className="mb-1.5 block text-xs text-text-mute">Sessão do ingresso</span>
+            <span className="mb-1 block font-heading text-base font-bold">
+              {resolvedEvent.title}
+            </span>
+            <span className="mb-5 block text-sm text-text-dim">
+              {venueLabels[resolvedEvent.venue]} · Sala {resolvedEvent.room} ·{" "}
+              {formatEventDateTime(resolvedEvent.startsAt)}
+            </span>
 
-        <GateValidationForm
-          code={code}
-          onCodeChange={setCode}
-          submitting={submitting}
-          error={formError}
-          onSubmit={handleValidate}
-          inputRef={inputRef}
-        />
+            {formError && (
+              <p className="mb-4 rounded-[9px] border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
+                {formError}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={handleConfirmValidate}
+              disabled={submitting}
+              className="mb-2.5 w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting ? "Validando..." : "Validar ingresso"}
+            </button>
+            <button
+              type="button"
+              onClick={handleCancelLookup}
+              disabled={submitting}
+              className="w-full text-center text-sm text-text-dim hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Ler outro código
+            </button>
+          </div>
+        ) : (
+          <GateValidationForm
+            code={code}
+            onCodeChange={setCode}
+            submitting={submitting}
+            error={formError}
+            onSubmit={handleLookup}
+            inputRef={inputRef}
+            submitLabel="Buscar sessão"
+            submittingLabel="Buscando..."
+          />
+        )}
 
         {result && <ValidationResult response={result} />}
       </div>
