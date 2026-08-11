@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { appRoutes } from "@/config/routes";
 import { ApiError } from "@/lib/api-client";
 import {
+  formatApiErrorMessage,
   formatCurrency,
   fromDateTimeLocalValue,
   toDateTimeLocalValue,
@@ -116,7 +117,7 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
   function validateSharedFields(): string | null {
     if (!startsAtLocal) return "Informe a data e hora do evento.";
     if (new Date(fromDateTimeLocalValue(startsAtLocal)).getTime() <= Date.now()) {
-      return "A data do evento precisa ser no futuro.";
+      return "Escolha uma data e horário futuros para o evento.";
     }
     if (!venue) return "Selecione o cinema (Cine Verzel 1 ou 2).";
     const roomNumber = Number(room);
@@ -183,7 +184,9 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
       // O evento já foi criado (como rascunho) nesse ponto — manda pra edição
       // dele em vez de deixar o usuário tentar de novo e criar um duplicado.
       const message =
-        err instanceof ApiError ? err.message : "Não foi possível publicar o evento.";
+        err instanceof ApiError
+          ? formatApiErrorMessage(err.message)
+          : "Não foi possível publicar o evento.";
       router.push(
         `${appRoutes.organizerEventDetails(created.id)}?publishError=${encodeURIComponent(message)}`,
       );
@@ -215,7 +218,7 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
     } catch (err) {
       setError(
         err instanceof ApiError
-          ? err.message
+          ? formatApiErrorMessage(err.message)
           : "Não foi possível salvar as alterações.",
       );
       setSubmitting(false);
@@ -231,7 +234,9 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
       router.push(appRoutes.organizerEvents);
     } catch (err) {
       setError(
-        err instanceof ApiError ? err.message : "Não foi possível publicar o evento.",
+        err instanceof ApiError
+          ? formatApiErrorMessage(err.message)
+          : "Não foi possível publicar o evento.",
       );
       setSubmitting(false);
     }
