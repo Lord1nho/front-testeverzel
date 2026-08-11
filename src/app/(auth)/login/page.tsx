@@ -5,25 +5,25 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { roleHomeRoute } from "@/config/routes";
 import { ApiError } from "@/lib/api-client";
+import { useToast } from "@/components/toast/ToastProvider";
 import { login } from "@/services/auth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const toast = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
     setIsSubmitting(true);
 
     try {
       const { user } = await login(email, password);
       router.push(roleHomeRoute(user.role));
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof ApiError
           ? err.message
           : "Não foi possível conectar ao servidor.",
@@ -91,12 +91,6 @@ export default function LoginPage() {
           >
             Esqueci minha senha
           </Link>
-
-          {error && (
-            <p className="rounded-[9px] border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
-              {error}
-            </p>
-          )}
 
           <button
             type="submit"
