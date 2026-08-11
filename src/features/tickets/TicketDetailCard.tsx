@@ -4,7 +4,7 @@ import { venueLabels } from "@/lib/venue";
 import type { TicketDetail } from "@/types/ticket";
 
 const statusConfig: Record<TicketDetail["status"], { label: string; className: string }> = {
-  VALID: { label: "Confirmado", className: "bg-accent-green text-[#05070a]" },
+  VALID: { label: "Válido", className: "bg-accent-green text-[#05070a]" },
   USED: { label: "Utilizado", className: "border border-border text-text-mute" },
   CANCELLED: { label: "Cancelado", className: "border border-red-500/30 text-red-400" },
 };

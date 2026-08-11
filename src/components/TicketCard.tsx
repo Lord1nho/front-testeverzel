@@ -5,7 +5,7 @@ import { venueLabels } from "@/lib/venue";
 import type { TicketSummary } from "@/types/ticket";
 
 const statusConfig: Record<TicketSummary["status"], { label: string; className: string }> = {
-  VALID: { label: "✓ Confirmado", className: "text-accent-green" },
+  VALID: { label: "✓ Válido", className: "text-accent-green" },
   USED: { label: "Utilizado", className: "text-text-mute" },
   CANCELLED: { label: "Cancelado", className: "text-red-400" },
 };
