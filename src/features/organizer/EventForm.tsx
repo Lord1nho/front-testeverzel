@@ -402,6 +402,20 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
               onChange={(event) => setStartsAtLocal(event.target.value)}
               className={inputClassName}
             />
+            {startsAtLocal && (
+              // O input nativo organiza dia/mês conforme o idioma do
+              // navegador, não necessariamente como no Brasil — mostrar a
+              // data já interpretada evita que a pessoa digite no campo
+              // errado sem perceber (ex.: trocar dia por mês).
+              <span className="mt-1 block text-[11px] text-text-mute">
+                {new Date(fromDateTimeLocalValue(startsAtLocal)).toLocaleDateString("pt-BR", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
+            )}
           </div>
           <div>
             <label className="mb-1.5 block text-xs text-text-mute">
