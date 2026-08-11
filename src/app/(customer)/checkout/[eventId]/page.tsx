@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { appRoutes } from "@/config/routes";
-import { ApiError } from "@/lib/api-client";
+import { apiClient, ApiError } from "@/lib/api-client";
 import { formatCurrency, formatEventDateTime } from "@/lib/format";
 import { venueLabels } from "@/lib/venue";
 import { CheckoutSummary } from "@/features/checkout/CheckoutSummary";
@@ -41,6 +41,11 @@ export default function CheckoutPage() {
   const [paying, setPaying] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
+  const [declineNotice, setDeclineNotice] = useState<{
+    reason: string | null;
+    attempt: number;
+    maxAttempts: number;
+  } | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [cancelled, setCancelled] = useState(false);
@@ -48,6 +53,25 @@ export default function CheckoutPage() {
   const loadSeats = useCallback(() => {
     return getEventSeats(eventId).then((data) => setSeats(data.seats));
   }, [eventId]);
+
+  // Libera a reserva se a pessoa sair da tela de pagamento sem passar pelos
+  // botões explícitos (ex.: voltar/avançar do navegador). A ref é atualizada
+  // a cada render pra sempre refletir a reserva atual; o efeito abaixo roda
+  // só no unmount de verdade (deps vazias) — se `reservation` entrasse nas
+  // deps, o cleanup dispararia a cada troca de reserva, não só ao sair.
+  const pendingReservationIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    pendingReservationIdRef.current =
+      reservation && !paymentResult && !cancelled ? reservation.id : null;
+  }, [reservation, paymentResult, cancelled]);
+
+  useEffect(() => {
+    return () => {
+      const id = pendingReservationIdRef.current;
+      if (id) apiClient.postBeacon(`/api/reservations/${id}/cancel`);
+    };
+  }, []);
 
   useEffect(() => {
     getMe()
@@ -126,9 +150,25 @@ export default function CheckoutPage() {
     setPaying(true);
     setPaymentError(null);
     setSessionExpired(false);
+    setDeclineNotice(null);
 
     try {
       const result = await createPayment({ reservationId: reservation.id, card });
+
+      // Recusado mas ainda com tentativa sobrando (até 3 por reserva, regra
+      // do backend): a reserva continua PENDING_PAYMENT e o assento continua
+      // RESERVED, então a pessoa fica na mesma tela de pagamento e tenta de
+      // novo. Só sai daqui pra tela de resultado quando o backend fecha a
+      // reserva (aprovado, ou recusa na 3ª/última tentativa).
+      if (result.reservationStatus === "PENDING_PAYMENT") {
+        setDeclineNotice({
+          reason: result.payment.failureReason,
+          attempt: result.attempt,
+          maxAttempts: result.maxAttempts,
+        });
+        return;
+      }
+
       setPaymentResult(result);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
@@ -136,7 +176,7 @@ export default function CheckoutPage() {
         setPaymentError("Sua sessão expirou. Entre novamente para continuar.");
       } else if (err instanceof ApiError && err.status === 409) {
         setPaymentError(
-          "Este pagamento já foi processado em outra tentativa. Confira em Meus ingressos.",
+          "Essa reserva já está sendo processada ou já foi concluída. Atualize a página para conferir o status.",
         );
       } else {
         setPaymentError(
@@ -169,6 +209,11 @@ export default function CheckoutPage() {
     if (reservation) {
       await cancelReservation(reservation.id).catch(() => {});
     }
+    // Não zera `reservation` aqui — faria a tela renderizar de volta a
+    // seleção de assentos por um instante antes da navegação terminar. O
+    // cleanup do useEffect acima ainda vai disparar um cancelamento pra
+    // essa mesma reserva quando a página desmontar, mas é um 400 inofensivo
+    // (reserva já cancelada), sem efeito visível.
     router.push(appRoutes.eventDetails(eventId));
   }
 
@@ -176,6 +221,7 @@ export default function CheckoutPage() {
     setReservation(null);
     setPaymentResult(null);
     setPaymentError(null);
+    setDeclineNotice(null);
     setSessionExpired(false);
     setCancelled(false);
     setSelectedIds([]);
@@ -273,7 +319,12 @@ export default function CheckoutPage() {
           <PaymentForm
             totalAmount={reservation.totalAmount}
             submitting={paying}
-            error={paymentError}
+            error={
+              paymentError ??
+              (declineNotice
+                ? `${declineNotice.reason ?? "Cartão recusado."} Tentativa ${declineNotice.attempt} de ${declineNotice.maxAttempts} — você ainda pode tentar com outro cartão.`
+                : null)
+            }
             onSubmit={handlePay}
           />
 
