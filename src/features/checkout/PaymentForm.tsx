@@ -17,7 +17,7 @@ interface PaymentFormProps {
 function formatCardNumber(value: string): string {
   return value
     .replace(/\D/g, "")
-    .slice(0, 19)
+    .slice(0, 16)
     .replace(/(.{4})/g, "$1 ")
     .trim();
 }
