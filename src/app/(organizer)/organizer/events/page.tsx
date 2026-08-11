@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { appRoutes } from "@/config/routes";
+import { useToast } from "@/components/toast/ToastProvider";
 import { ApiError } from "@/lib/api-client";
 import { formatCurrency, formatEventDateTime } from "@/lib/format";
 import { venueLabels } from "@/lib/venue";
@@ -34,10 +35,15 @@ type Tab = "mine" | "all";
 
 export default function OrganizerEventsPage() {
   const router = useRouter();
+  const toast = useToast();
   const [tab, setTab] = useState<Tab>("mine");
   const [events, setEvents] = useState<EventSummary[] | null>(null);
   const [now, setNow] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Não precisa ser estado (não afeta o que é renderizado diretamente) —
+  // só marca se algum carregamento já teve sucesso antes, pra decidir se
+  // um erro de troca de aba trava a tela ou só avisa com um toast.
+  const hasLoadedOnceRef = useRef(false);
 
   async function handleLogout() {
     await logout().catch(() => {});
@@ -51,13 +57,18 @@ export default function OrganizerEventsPage() {
         setEvents(data.events);
         setNow(Date.now());
         setError(null);
+        hasLoadedOnceRef.current = true;
       })
       .catch((err) => {
-        setError(
-          err instanceof ApiError ? err.message : "Não foi possível carregar os eventos.",
-        );
+        const message =
+          err instanceof ApiError ? err.message : "Não foi possível carregar os eventos.";
+        if (hasLoadedOnceRef.current) {
+          toast.error(message);
+        } else {
+          setError(message);
+        }
       });
-  }, [tab]);
+  }, [tab, toast]);
 
   return (
     <main className="min-h-dvh px-10 py-10">

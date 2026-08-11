@@ -4,13 +4,10 @@ import { EventForm } from "@/features/organizer/EventForm";
 
 export default async function EditOrganizerEventPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ publishError?: string }>;
 }) {
   const { id } = await params;
-  const { publishError } = await searchParams;
 
   return (
     <main className="min-h-dvh">
@@ -23,7 +20,7 @@ export default async function EditOrganizerEventPage({
         </Link>
         <span className="font-heading text-lg font-bold">Editar evento</span>
       </div>
-      <EventForm key={id} eventId={id} initialError={publishError} />
+      <EventForm key={id} eventId={id} />
     </main>
   );
 }
