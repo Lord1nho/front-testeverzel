@@ -80,7 +80,9 @@ function postBeacon(path: string): void {
     method: "POST",
     credentials: "include",
     keepalive: true,
-  }).catch(() => {});
+  }).catch((error) => {
+    console.error(`postBeacon falhou para ${path}:`, error);
+  });
 }
 
 export const apiClient = {

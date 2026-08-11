@@ -62,9 +62,12 @@ export default function CheckoutPage() {
   const pendingReservationIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Se a sessão já expirou, o cookie usado pela chamada de cancelamento
+    // também vai ser rejeitado — não adianta tentar, e a reserva se libera
+    // sozinha no backend quando expirar (bloqueio de 15 min).
     pendingReservationIdRef.current =
-      reservation && !paymentResult && !cancelled ? reservation.id : null;
-  }, [reservation, paymentResult, cancelled]);
+      reservation && !paymentResult && !cancelled && !sessionExpired ? reservation.id : null;
+  }, [reservation, paymentResult, cancelled, sessionExpired]);
 
   useEffect(() => {
     return () => {
