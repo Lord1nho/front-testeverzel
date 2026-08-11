@@ -320,6 +320,10 @@ export default function CheckoutPage() {
 
         <div className="flex flex-col gap-8 lg:flex-row">
           <PaymentForm
+            // Muda a cada tentativa recusada — força o React a remontar o
+            // formulário do zero (limpando número, validade e cvv) em vez
+            // de manter os dados do cartão que acabou de ser recusado.
+            key={`${reservation.id}-${declineNotice?.attempt ?? 0}`}
             totalAmount={reservation.totalAmount}
             submitting={paying}
             error={
