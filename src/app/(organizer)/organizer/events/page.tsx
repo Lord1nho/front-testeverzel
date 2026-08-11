@@ -50,6 +50,7 @@ export default function OrganizerEventsPage() {
       .then((data) => {
         setEvents(data.events);
         setNow(Date.now());
+        setError(null);
       })
       .catch((err) => {
         setError(
