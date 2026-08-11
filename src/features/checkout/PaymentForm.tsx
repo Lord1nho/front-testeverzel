@@ -37,8 +37,12 @@ function validateCard(fields: {
     return "Mês de validade inválido.";
   }
   const year = Number(fields.expiryYear);
-  if (!Number.isInteger(year) || year < new Date().getFullYear()) {
+  const now = new Date();
+  if (!Number.isInteger(year) || year < now.getFullYear()) {
     return "Ano de validade inválido.";
+  }
+  if (year === now.getFullYear() && month < now.getMonth() + 1) {
+    return "Cartão vencido.";
   }
   if (!/^\d{3,4}$/.test(fields.cvv)) return "CVV inválido.";
   return null;
