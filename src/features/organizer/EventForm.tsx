@@ -48,7 +48,6 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
   const [selectedMovie, setSelectedMovie] = useState<MovieDetails | null>(null);
   const [selectedMovieLoading, setSelectedMovieLoading] = useState(false);
 
-  const [title, setTitle] = useState("");
   const [startsAtLocal, setStartsAtLocal] = useState("");
   const [venue, setVenue] = useState<Venue | "">("");
   const [room, setRoom] = useState("");
@@ -63,7 +62,6 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
       .then(({ event: loaded }) => {
         setEvent(loaded);
         setLocked(new Date(loaded.startsAt).getTime() < Date.now());
-        setTitle(loaded.title);
         setStartsAtLocal(toDateTimeLocalValue(loaded.startsAt));
         setVenue(loaded.venue);
         setRoom(String(loaded.room));
@@ -140,7 +138,6 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
   function buildCreateInput(): CreateEventInput {
     return {
       tmdbId: selectedMovie!.tmdbId,
-      title: title.trim() || undefined,
       startsAt: fromDateTimeLocalValue(startsAtLocal),
       venue: venue as Venue,
       room: Number(room),
@@ -205,7 +202,6 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
     setError(null);
     try {
       const input: UpdateEventInput = {
-        title: title.trim() || undefined,
         startsAt: fromDateTimeLocalValue(startsAtLocal),
         venue: venue as Venue,
         room: Number(room),
@@ -391,17 +387,6 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
           {isEditMode ? "Configurar evento" : "2. Configurar evento"}
         </h3>
         <div className="grid max-w-xl grid-cols-2 gap-4">
-          <div className="col-span-2">
-            <label className="mb-1.5 block text-xs text-text-mute">
-              Título (opcional — padrão é o título do filme)
-            </label>
-            <input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder={selectedMovie?.title ?? event?.catalogItem.title}
-              className={inputClassName}
-            />
-          </div>
           <div>
             <label className="mb-1.5 block text-xs text-text-mute">
               Data e hora
@@ -489,7 +474,7 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
         {reviewTitle ? (
           <>
             <span className="mb-1.5 block text-sm font-semibold">
-              {title.trim() || reviewTitle}
+              {reviewTitle}
             </span>
             <span className="mb-4 block text-xs text-text-mute">
               {venue ? `${venueLabels[venue]} · Sala ${room || "?"}` : "Cinema não definido"}
