@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { roleHomeRoute } from "@/config/routes";
@@ -85,30 +84,13 @@ export default function LoginPage() {
             />
           </div>
 
-          <Link
-            href="#"
-            className="-mt-1 self-end text-xs text-accent-cyan hover:text-accent-lime"
-          >
-            Esqueci minha senha
-          </Link>
-
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-3 rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Entrando..." : "Entrar"}
           </button>
-
-          <span className="mt-2 text-center text-[13px] text-text-mute">
-            Não tem conta?{" "}
-            <Link
-              href="#"
-              className="font-semibold text-foreground hover:text-accent-lime"
-            >
-              Cadastre-se
-            </Link>
-          </span>
         </form>
       </div>
     </main>
