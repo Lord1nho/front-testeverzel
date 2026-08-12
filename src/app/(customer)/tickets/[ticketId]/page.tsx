@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { appRoutes } from "@/config/routes";
+import { useToast } from "@/components/toast/ToastProvider";
 import { QrTicket } from "@/features/tickets/QrTicket";
 import { TicketDetailCard } from "@/features/tickets/TicketDetailCard";
 import { ApiError } from "@/lib/api-client";
@@ -17,6 +18,7 @@ type AuthState = "loading" | "guest" | "wrong-role" | "customer";
 export default function TicketDetailsPage() {
   const params = useParams<{ ticketId: string }>();
   const router = useRouter();
+  const toast = useToast();
   const [authState, setAuthState] = useState<AuthState>("loading");
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
   const [posterUrl, setPosterUrl] = useState<string | null>(null);
@@ -24,8 +26,6 @@ export default function TicketDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
-  const [shareError, setShareError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     getMe()
@@ -58,12 +58,11 @@ export default function TicketDetailsPage() {
 
   async function handleShare() {
     setSharing(true);
-    setShareError(null);
     try {
       const { shareLink: link } = await shareTicket(params.ticketId);
       setShareLink(`${window.location.origin}${appRoutes.sharedTicket(link.token)}`);
     } catch (err) {
-      setShareError(err instanceof ApiError ? err.message : "Não foi possível gerar o link.");
+      toast.error(err instanceof ApiError ? err.message : "Não foi possível gerar o link.");
     } finally {
       setSharing(false);
     }
@@ -72,8 +71,7 @@ export default function TicketDetailsPage() {
   async function handleCopy() {
     if (!shareLink) return;
     await navigator.clipboard.writeText(shareLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    toast.success("Link copiado!");
   }
 
   if (authState === "loading") {
@@ -160,7 +158,7 @@ export default function TicketDetailsPage() {
                     onClick={handleCopy}
                     className="w-full rounded-[10px] border border-border bg-surface-2 py-3 text-center text-sm font-semibold text-foreground hover:bg-border"
                   >
-                    {copied ? "Link copiado!" : "Copiar link"}
+                    Copiar link
                   </button>
                 </div>
               ) : (
@@ -173,7 +171,6 @@ export default function TicketDetailsPage() {
                   {sharing ? "Gerando link..." : "Compartilhar ingresso"}
                 </button>
               )}
-              {shareError && <p className="mt-2 text-xs text-red-400">{shareError}</p>}
             </div>
           }
         />

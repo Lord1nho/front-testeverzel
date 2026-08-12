@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { appRoutes } from "@/config/routes";
+import { useToast } from "@/components/toast/ToastProvider";
 import { ApiError } from "@/lib/api-client";
 import {
   formatApiErrorMessage,
@@ -30,11 +31,11 @@ const inputClassName =
 
 interface EventFormProps {
   eventId?: string;
-  initialError?: string;
 }
 
-export function EventForm({ eventId, initialError }: EventFormProps) {
+export function EventForm({ eventId }: EventFormProps) {
   const router = useRouter();
+  const toast = useToast();
   const isEditMode = Boolean(eventId);
 
   const [event, setEvent] = useState<EventDetail | null>(null);
@@ -54,7 +55,7 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
   const [room, setRoom] = useState("");
   const [capacity, setCapacity] = useState("");
   const [price, setPrice] = useState("");
-  const [error, setError] = useState<string | null>(initialError ?? null);
+  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -97,14 +98,13 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
   }, [query, isEditMode]);
 
   async function handleSelectMovie(summary: MovieSummary) {
-    setError(null);
     setSelectedMovie(null);
     setSelectedMovieLoading(true);
     try {
       const { movie } = await getMovieDetails(summary.tmdbId);
       setSelectedMovie(movie);
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof ApiError
           ? err.message
           : "Não foi possível carregar os detalhes do filme.",
@@ -165,7 +165,7 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
     try {
       ({ event: created } = await createEvent(buildCreateInput()));
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof ApiError ? err.message : "Não foi possível criar o evento.",
       );
       setSubmitting(false);
@@ -173,23 +173,26 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
     }
 
     if (!publishAfter) {
+      toast.success("Rascunho salvo.");
       router.push(appRoutes.organizerEvents);
       return;
     }
 
     try {
       await publishEvent(created.id);
+      toast.success("Evento publicado.");
       router.push(appRoutes.organizerEvents);
     } catch (err) {
       // O evento já foi criado (como rascunho) nesse ponto — manda pra edição
       // dele em vez de deixar o usuário tentar de novo e criar um duplicado.
-      const message =
+      // O toast sobrevive à navegação (o provider fica no layout raiz), então
+      // dá pra disparar aqui mesmo, sem precisar passar a mensagem por query string.
+      toast.error(
         err instanceof ApiError
           ? formatApiErrorMessage(err.message)
-          : "Não foi possível publicar o evento.";
-      router.push(
-        `${appRoutes.organizerEventDetails(created.id)}?publishError=${encodeURIComponent(message)}`,
+          : "Não foi possível publicar o evento.",
       );
+      router.push(appRoutes.organizerEventDetails(created.id));
     }
   }
 
@@ -214,9 +217,10 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
         input.capacity = Number(capacity);
       }
       await updateEvent(eventId, input);
+      toast.success("Alterações salvas.");
       router.push(appRoutes.organizerEvents);
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof ApiError
           ? formatApiErrorMessage(err.message)
           : "Não foi possível salvar as alterações.",
@@ -231,9 +235,10 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
     setError(null);
     try {
       await publishEvent(eventId);
+      toast.success("Evento publicado.");
       router.push(appRoutes.organizerEvents);
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof ApiError
           ? formatApiErrorMessage(err.message)
           : "Não foi possível publicar o evento.",
@@ -253,9 +258,10 @@ export function EventForm({ eventId, initialError }: EventFormProps) {
     setError(null);
     try {
       await deleteEvent(eventId);
+      toast.success("Evento excluído.");
       router.push(appRoutes.organizerEvents);
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof ApiError ? err.message : "Não foi possível excluir o evento.",
       );
       setSubmitting(false);

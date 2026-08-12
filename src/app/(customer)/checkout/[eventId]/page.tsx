@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { appRoutes } from "@/config/routes";
+import { useToast } from "@/components/toast/ToastProvider";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { formatCurrency, formatEventDateTime } from "@/lib/format";
 import { venueLabels } from "@/lib/venue";
@@ -26,6 +27,7 @@ type AuthState = "loading" | "guest" | "wrong-role" | "customer";
 export default function CheckoutPage() {
   const params = useParams<{ eventId: string }>();
   const router = useRouter();
+  const toast = useToast();
   const eventId = params.eventId;
 
   const [authState, setAuthState] = useState<AuthState>("loading");
@@ -35,11 +37,9 @@ export default function CheckoutPage() {
   const [seats, setSeats] = useState<Seat[] | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const [reservation, setReservation] = useState<Reservation | null>(null);
 
   const [paying, setPaying] = useState(false);
-  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
   const [declineNotice, setDeclineNotice] = useState<{
     reason: string | null;
@@ -104,7 +104,6 @@ export default function CheckoutPage() {
 
   function toggleSeat(seat: Seat) {
     if (seat.status !== "AVAILABLE") return;
-    setSubmitError(null);
     setSelectedIds((current) => {
       if (current.includes(seat.id)) {
         return current.filter((id) => id !== seat.id);
@@ -118,7 +117,6 @@ export default function CheckoutPage() {
     if (authState !== "customer" || !event || selectedIds.length === 0) return;
 
     setSubmitting(true);
-    setSubmitError(null);
 
     try {
       const { reservation: created } = await createReservation({
@@ -130,15 +128,15 @@ export default function CheckoutPage() {
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setAuthState("guest");
-        setSubmitError("Sua sessão expirou. Entre novamente para continuar.");
+        toast.info("Sua sessão expirou. Entre novamente para continuar.");
       } else if (err instanceof ApiError && err.status === 409) {
-        setSubmitError(
+        toast.error(
           "Alguns assentos escolhidos não estão mais disponíveis. Selecione novamente.",
         );
         setSelectedIds([]);
         loadSeats().catch(() => {});
       } else {
-        setSubmitError(
+        toast.error(
           err instanceof ApiError ? err.message : "Não foi possível concluir a reserva.",
         );
       }
@@ -151,7 +149,6 @@ export default function CheckoutPage() {
     if (!reservation) return;
 
     setPaying(true);
-    setPaymentError(null);
     setSessionExpired(false);
     setDeclineNotice(null);
 
@@ -175,14 +172,15 @@ export default function CheckoutPage() {
       setPaymentResult(result);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
+        // Fica com o aviso fixo na tela (com o link de login) em vez de um
+        // toast, que some sozinho antes da pessoa conseguir agir.
         setSessionExpired(true);
-        setPaymentError("Sua sessão expirou. Entre novamente para continuar.");
       } else if (err instanceof ApiError && err.status === 409) {
-        setPaymentError(
+        toast.error(
           "Essa reserva já está sendo processada ou já foi concluída. Atualize a página para conferir o status.",
         );
       } else {
-        setPaymentError(
+        toast.error(
           err instanceof ApiError ? err.message : "Não foi possível processar o pagamento.",
         );
       }
@@ -195,12 +193,11 @@ export default function CheckoutPage() {
     if (!reservation) return;
 
     setCancelling(true);
-    setPaymentError(null);
     try {
       await cancelReservation(reservation.id);
       setCancelled(true);
     } catch (err) {
-      setPaymentError(
+      toast.error(
         err instanceof ApiError ? err.message : "Não foi possível cancelar a reserva.",
       );
     } finally {
@@ -223,7 +220,6 @@ export default function CheckoutPage() {
   function resetToSelection() {
     setReservation(null);
     setPaymentResult(null);
-    setPaymentError(null);
     setDeclineNotice(null);
     setSessionExpired(false);
     setCancelled(false);
@@ -327,10 +323,9 @@ export default function CheckoutPage() {
             totalAmount={reservation.totalAmount}
             submitting={paying}
             error={
-              paymentError ??
-              (declineNotice
+              declineNotice
                 ? `${declineNotice.reason ?? "Cartão recusado."} Tentativa ${declineNotice.attempt} de ${declineNotice.maxAttempts} — você ainda pode tentar com outro cartão.`
-                : null)
+                : null
             }
             onSubmit={handlePay}
           />
@@ -414,7 +409,6 @@ export default function CheckoutPage() {
           room={event.room}
           selectedSeats={selectedSeats}
           pricePerSeat={event.price}
-          error={submitError}
           submitting={submitting}
           loginHref={authState === "guest" ? appRoutes.login : undefined}
           blockedReason={authState !== "guest" ? blockedReason : null}

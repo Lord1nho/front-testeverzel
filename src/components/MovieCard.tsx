@@ -31,15 +31,15 @@ export function MovieCard({ group }: { group: MovieGroup }) {
   return (
     <Link
       href={appRoutes.eventDetails(primarySession.id)}
-      className="group flex flex-col gap-3"
+      className="group flex w-[152px] flex-none flex-col gap-2.5 sm:w-[168px]"
     >
-      <div className="relative aspect-[2/3] w-full flex-none overflow-hidden rounded-xl bg-surface-2 ring-1 ring-border transition-shadow group-hover:ring-accent-cyan">
+      <div className="relative aspect-[2/3] w-full flex-none overflow-hidden rounded-lg bg-surface-2 ring-1 ring-border transition-shadow group-hover:ring-accent-cyan">
         {catalogItem.imageUrl ? (
           <Image
             src={catalogItem.imageUrl}
             alt={catalogItem.title}
             fill
-            sizes="(min-width: 1024px) 25vw, 45vw"
+            sizes="168px"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
@@ -48,26 +48,26 @@ export function MovieCard({ group }: { group: MovieGroup }) {
           </div>
         )}
         <span
-          className={`absolute right-2.5 top-2.5 rounded-md px-2 py-1 text-[11px] font-bold ${availability.className}`}
+          className={`absolute right-2 top-2 rounded-md px-1.5 py-0.5 text-[10px] font-bold ${availability.className}`}
         >
           {availability.label}
         </span>
       </div>
 
       <div>
-        <span className="block text-[15px] font-semibold leading-tight">
+        <span className="block truncate text-[13px] font-semibold leading-tight">
           {catalogItem.title}
         </span>
-        <span className="mt-1 block text-xs text-text-mute">
+        <span className="mt-0.5 block text-[11px] text-text-mute">
           {availability.count > 0
             ? availability.count > 1
-              ? `${availability.count} sessões disponíveis`
-              : "1 sessão disponível"
-            : "Sem sessões disponíveis"}
+              ? `${availability.count} sessões`
+              : "1 sessão"
+            : "Sem sessões"}
         </span>
       </div>
 
-      <span className="rounded-[9px] bg-accent-lime py-2.5 text-center text-[13px] font-bold text-[#05070a] transition-opacity group-hover:opacity-90">
+      <span className="rounded-[8px] bg-accent-lime py-2 text-center text-xs font-bold text-[#05070a] transition-opacity group-hover:opacity-90">
         Ver sessões
       </span>
     </Link>

@@ -9,7 +9,6 @@ interface GateValidationFormProps {
   code: string;
   onCodeChange: (value: string) => void;
   submitting: boolean;
-  error: string | null;
   onSubmit: (code: string) => void;
   inputRef: RefObject<HTMLInputElement | null>;
   submitLabel?: string;
@@ -20,7 +19,6 @@ export function GateValidationForm({
   code,
   onCodeChange,
   submitting,
-  error,
   onSubmit,
   inputRef,
   submitLabel = "Validar ingresso",
@@ -48,12 +46,6 @@ export function GateValidationForm({
         autoFocus
         className={inputClassName}
       />
-
-      {error && (
-        <p className="mt-3 rounded-[9px] border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
-          {error}
-        </p>
-      )}
 
       <button
         type="submit"

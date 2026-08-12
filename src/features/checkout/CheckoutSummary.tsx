@@ -9,7 +9,6 @@ interface CheckoutSummaryProps {
   room: number;
   selectedSeats: Seat[];
   pricePerSeat: number;
-  error: string | null;
   submitting: boolean;
   loginHref?: string;
   blockedReason?: string | null;
@@ -23,7 +22,6 @@ export function CheckoutSummary({
   room,
   selectedSeats,
   pricePerSeat,
-  error,
   submitting,
   loginHref,
   blockedReason,
@@ -71,12 +69,6 @@ export function CheckoutSummary({
       </div>
 
       <div className="mb-4 h-px bg-border" />
-
-      {error && (
-        <p className="mb-4 rounded-[9px] border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
-          {error}
-        </p>
-      )}
 
       {blockedReason && (
         <p className="mb-4 rounded-[9px] border border-border bg-surface-2 px-3 py-2 text-xs text-text-dim">

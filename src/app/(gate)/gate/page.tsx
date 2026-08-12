@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { appRoutes } from "@/config/routes";
+import { useToast } from "@/components/toast/ToastProvider";
 import { GateValidationForm } from "@/features/gate/GateValidationForm";
 import { ValidationResult } from "@/features/gate/ValidationResult";
 import { ApiError } from "@/lib/api-client";
@@ -17,11 +18,11 @@ type AuthState = "loading" | "guest" | "wrong-role" | "gate";
 
 export default function GatePage() {
   const router = useRouter();
+  const toast = useToast();
   const [authState, setAuthState] = useState<AuthState>("loading");
   const [code, setCode] = useState("");
   const [resolvedEvent, setResolvedEvent] = useState<GateEventLookup | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
   const [result, setResult] = useState<GateValidationResponse | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -39,11 +40,11 @@ export default function GatePage() {
   function handleAuthOrGenericError(err: unknown, fallback: string) {
     if (err instanceof ApiError && err.status === 401) {
       setAuthState("guest");
-      setFormError("Sua sessão expirou. Entre novamente para continuar.");
+      toast.info("Sua sessão expirou. Entre novamente para continuar.");
     } else if (err instanceof ApiError && err.status === 403) {
       setAuthState("wrong-role");
     } else {
-      setFormError(err instanceof ApiError ? err.message : fallback);
+      toast.error(err instanceof ApiError ? err.message : fallback);
     }
   }
 
@@ -53,7 +54,6 @@ export default function GatePage() {
   // confirmar a entrada na etapa 2.
   async function handleLookup(submittedCode: string) {
     setSubmitting(true);
-    setFormError(null);
     setResult(null);
 
     try {
@@ -83,7 +83,6 @@ export default function GatePage() {
     if (!resolvedEvent) return;
 
     setSubmitting(true);
-    setFormError(null);
 
     try {
       const response = await validateTicket({ eventId: resolvedEvent.id, code });
@@ -101,7 +100,6 @@ export default function GatePage() {
   function handleCancelLookup() {
     setResolvedEvent(null);
     setCode("");
-    setFormError(null);
     inputRef.current?.focus();
   }
 
@@ -161,12 +159,6 @@ export default function GatePage() {
               {formatEventDateTime(resolvedEvent.startsAt)}
             </span>
 
-            {formError && (
-              <p className="mb-4 rounded-[9px] border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
-                {formError}
-              </p>
-            )}
-
             <button
               type="button"
               onClick={handleConfirmValidate}
@@ -189,7 +181,6 @@ export default function GatePage() {
             code={code}
             onCodeChange={setCode}
             submitting={submitting}
-            error={formError}
             onSubmit={handleLookup}
             inputRef={inputRef}
             submitLabel="Buscar sessão"
