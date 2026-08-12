@@ -24,6 +24,8 @@ export interface PaymentIssuedTicket {
 
 export interface PaymentResult {
   payment: Payment;
-  reservationStatus: "PAID" | "PAYMENT_DECLINED";
+  reservationStatus: "PAID" | "PAYMENT_DECLINED" | "PENDING_PAYMENT";
   tickets: PaymentIssuedTicket[];
+  attempt: number;
+  maxAttempts: number;
 }

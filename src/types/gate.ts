@@ -1,4 +1,14 @@
+import type { Venue } from "@/types/event";
+
 export type GateValidationResult = "VALID" | "INVALID" | "ALREADY_USED" | "WRONG_EVENT";
+
+export interface GateEventLookup {
+  id: string;
+  title: string;
+  startsAt: string;
+  venue: Venue;
+  room: number;
+}
 
 export interface GateEventRef {
   id: string;

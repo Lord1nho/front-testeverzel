@@ -12,6 +12,8 @@ interface GateValidationFormProps {
   error: string | null;
   onSubmit: (code: string) => void;
   inputRef: RefObject<HTMLInputElement | null>;
+  submitLabel?: string;
+  submittingLabel?: string;
 }
 
 export function GateValidationForm({
@@ -21,6 +23,8 @@ export function GateValidationForm({
   error,
   onSubmit,
   inputRef,
+  submitLabel = "Validar ingresso",
+  submittingLabel = "Validando...",
 }: GateValidationFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,7 +60,7 @@ export function GateValidationForm({
         disabled={submitting || !code.trim()}
         className="mt-4 w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {submitting ? "Validando..." : "Validar ingresso"}
+        {submitting ? submittingLabel : submitLabel}
       </button>
     </form>
   );

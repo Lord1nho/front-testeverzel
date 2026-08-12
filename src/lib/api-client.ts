@@ -69,6 +69,22 @@ async function request<T>(path: string, options: RequestOptions = {}) {
   return response.json() as Promise<T>;
 }
 
+// Dispara um POST e não espera resposta — usado no cleanup de useEffect
+// quando a página está saindo (voltar/avançar do navegador, navegar pra
+// outra rota) e ainda dá tempo de avisar o backend. `keepalive` garante
+// que o navegador termina de enviar a requisição mesmo com a página
+// fechando; erros são propositalmente ignorados (não há UI pra mostrá-los).
+function postBeacon(path: string): void {
+  const url = new URL(path, apiBaseUrl);
+  fetch(url, {
+    method: "POST",
+    credentials: "include",
+    keepalive: true,
+  }).catch((error) => {
+    console.error(`postBeacon falhou para ${path}:`, error);
+  });
+}
+
 export const apiClient = {
   get: <T>(path: string, options?: RequestOptions) =>
     request<T>(path, { ...options, method: "GET" }),
@@ -80,4 +96,5 @@ export const apiClient = {
     request<T>(path, { ...options, method: "PATCH", body }),
   delete: <T>(path: string, options?: RequestOptions) =>
     request<T>(path, { ...options, method: "DELETE" }),
+  postBeacon,
 };

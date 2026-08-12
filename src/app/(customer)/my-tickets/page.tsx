@@ -7,6 +7,7 @@ import { TicketCard } from "@/components/TicketCard";
 import { appRoutes } from "@/config/routes";
 import { ApiError } from "@/lib/api-client";
 import { getMe, logout } from "@/services/auth";
+import { getPublishedEvent } from "@/services/public-events";
 import { listTickets } from "@/services/tickets";
 import type { TicketSummary } from "@/types/ticket";
 
@@ -20,6 +21,7 @@ export default function MyTicketsPage() {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("upcoming");
   const [now] = useState(() => Date.now());
+  const [posters, setPosters] = useState<Record<string, string | null>>({});
 
   async function handleLogout() {
     await logout().catch(() => {});
@@ -48,6 +50,20 @@ export default function MyTicketsPage() {
         router.replace(appRoutes.login);
       });
   }, [router]);
+
+  useEffect(() => {
+    if (!tickets || tickets.length === 0) return;
+
+    const eventIds = Array.from(new Set(tickets.map((ticket) => ticket.event.id)));
+    Promise.allSettled(eventIds.map((id) => getPublishedEvent(id))).then((results) => {
+      const next: Record<string, string | null> = {};
+      results.forEach((result, index) => {
+        next[eventIds[index]] =
+          result.status === "fulfilled" ? result.value.event.catalogItem.imageUrl : null;
+      });
+      setPosters(next);
+    });
+  }, [tickets]);
 
   const filteredTickets = useMemo(() => {
     if (!tickets) return null;
@@ -145,7 +161,11 @@ export default function MyTicketsPage() {
       {filteredTickets && filteredTickets.length > 0 && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {filteredTickets.map((ticket) => (
-            <TicketCard key={ticket.id} ticket={ticket} />
+            <TicketCard
+              key={ticket.id}
+              ticket={ticket}
+              posterUrl={posters[ticket.event.id] ?? null}
+            />
           ))}
         </div>
       )}

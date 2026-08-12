@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import type { GateValidationResponse } from "@/types/gate";
+import type { GateEventLookup, GateValidationResponse } from "@/types/gate";
 
 export interface ValidateTicketInput {
   eventId: string;
@@ -8,4 +8,10 @@ export interface ValidateTicketInput {
 
 export function validateTicket(input: ValidateTicketInput) {
   return apiClient.post<GateValidationResponse>("/api/gate/validate", input);
+}
+
+export function findTicketEvent(code: string) {
+  return apiClient.get<{ event: GateEventLookup }>(
+    `/api/gate/tickets/${encodeURIComponent(code)}/event`,
+  );
 }

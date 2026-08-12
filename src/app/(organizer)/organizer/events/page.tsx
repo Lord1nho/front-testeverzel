@@ -9,6 +9,7 @@ import { formatCurrency, formatEventDateTime } from "@/lib/format";
 import { venueLabels } from "@/lib/venue";
 import { logout } from "@/services/auth";
 import { listEvents } from "@/services/events";
+import { listPublishedEvents } from "@/services/public-events";
 import type { EventSummary } from "@/types/event";
 
 function getStatusLabel(
@@ -29,8 +30,11 @@ const statusClassName: Record<string, string> = {
   Cancelado: "border border-red-500/30 text-red-400",
 };
 
+type Tab = "mine" | "all";
+
 export default function OrganizerEventsPage() {
   const router = useRouter();
+  const [tab, setTab] = useState<Tab>("mine");
   const [events, setEvents] = useState<EventSummary[] | null>(null);
   const [now, setNow] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -41,17 +45,19 @@ export default function OrganizerEventsPage() {
   }
 
   useEffect(() => {
-    listEvents()
+    const request = tab === "mine" ? listEvents() : listPublishedEvents();
+    request
       .then((data) => {
         setEvents(data.events);
         setNow(Date.now());
+        setError(null);
       })
       .catch((err) => {
         setError(
           err instanceof ApiError ? err.message : "Não foi possível carregar os eventos.",
         );
       });
-  }, []);
+  }, [tab]);
 
   return (
     <main className="min-h-dvh px-10 py-10">
@@ -92,6 +98,31 @@ export default function OrganizerEventsPage() {
       </div>
 
       <h1 className="mb-5 font-heading text-2xl font-bold">Meus eventos</h1>
+
+      <div className="mb-6 flex gap-2.5">
+        <button
+          type="button"
+          onClick={() => setTab("mine")}
+          className={`rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+            tab === "mine"
+              ? "bg-accent-lime text-[#05070a]"
+              : "border border-border bg-surface text-text-dim hover:border-text-mute"
+          }`}
+        >
+          Meus eventos
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("all")}
+          className={`rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+            tab === "all"
+              ? "bg-accent-lime text-[#05070a]"
+              : "border border-border bg-surface text-text-dim hover:border-text-mute"
+          }`}
+        >
+          Todos os eventos
+        </button>
+      </div>
 
       {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
@@ -140,7 +171,14 @@ export default function OrganizerEventsPage() {
                 >
                   {statusLabel}
                 </span>
-                {editable ? (
+                {tab === "all" ? (
+                  <Link
+                    href={appRoutes.checkout(event.id)}
+                    className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
+                  >
+                    Ver
+                  </Link>
+                ) : editable ? (
                   <Link
                     href={appRoutes.organizerEventDetails(event.id)}
                     className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"

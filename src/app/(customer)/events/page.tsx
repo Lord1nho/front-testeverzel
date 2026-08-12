@@ -8,7 +8,7 @@ import { appRoutes } from "@/config/routes";
 import { EventHero } from "@/features/events/EventHero";
 import { ApiError } from "@/lib/api-client";
 import { groupEventsByMovie } from "@/lib/group-events";
-import { logout } from "@/services/auth";
+import { getMe, logout } from "@/services/auth";
 import { listPublishedEvents } from "@/services/public-events";
 import type { EventSummary } from "@/types/event";
 
@@ -16,6 +16,7 @@ export default function EventsPage() {
   const router = useRouter();
   const [events, setEvents] = useState<EventSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   async function handleLogout() {
     await logout().catch(() => {});
@@ -30,6 +31,12 @@ export default function EventsPage() {
           err instanceof ApiError ? err.message : "Não foi possível carregar os eventos.",
         );
       });
+  }, []);
+
+  useEffect(() => {
+    getMe()
+      .then(() => setIsAuthenticated(true))
+      .catch(() => setIsAuthenticated(false));
   }, []);
 
   const movieGroups = useMemo(() => {
@@ -51,16 +58,25 @@ export default function EventsPage() {
           </nav>
         </div>
         <div className="flex items-center gap-5 text-sm">
-          <Link href={appRoutes.profile} className="text-text-dim hover:text-foreground">
-            Perfil
-          </Link>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="text-text-dim hover:text-foreground"
-          >
-            Sair
-          </button>
+          {isAuthenticated === true && (
+            <>
+              <Link href={appRoutes.profile} className="text-text-dim hover:text-foreground">
+                Perfil
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="text-text-dim hover:text-foreground"
+              >
+                Sair
+              </button>
+            </>
+          )}
+          {isAuthenticated === false && (
+            <Link href={appRoutes.login} className="text-text-dim hover:text-foreground">
+              Fazer login
+            </Link>
+          )}
         </div>
       </div>
 

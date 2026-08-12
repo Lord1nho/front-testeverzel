@@ -29,8 +29,7 @@ export function PaymentOutcome({ payment, tickets, eventTitle, onRetry }: Paymen
       <p className="mb-6 text-sm text-text-dim">
         {approved
           ? `Seu ingresso para ${eventTitle} já está disponível em Meus ingressos.`
-          : (payment.failureReason ??
-            "O pagamento foi recusado. Tente novamente com outro cartão.")}
+          : `${payment.failureReason ?? "O pagamento foi recusado."} Essa reserva usou as 3 tentativas permitidas e foi encerrada — os assentos já foram liberados.`}
       </p>
 
       {approved && tickets.length > 0 && (
@@ -61,7 +60,7 @@ export function PaymentOutcome({ payment, tickets, eventTitle, onRetry }: Paymen
           onClick={onRetry}
           className="block w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95"
         >
-          Tentar novamente
+          Escolher assentos novamente
         </button>
       )}
     </div>

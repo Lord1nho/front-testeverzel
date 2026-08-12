@@ -14,6 +14,14 @@ interface PaymentFormProps {
   onSubmit: (card: CardInput) => void;
 }
 
+function formatCardNumber(value: string): string {
+  return value
+    .replace(/\D/g, "")
+    .slice(0, 16)
+    .replace(/(.{4})/g, "$1 ")
+    .trim();
+}
+
 function validateCard(fields: {
   number: string;
   holderName: string;
@@ -29,8 +37,12 @@ function validateCard(fields: {
     return "Mês de validade inválido.";
   }
   const year = Number(fields.expiryYear);
-  if (!Number.isInteger(year) || year < new Date().getFullYear()) {
+  const now = new Date();
+  if (!Number.isInteger(year) || year < now.getFullYear()) {
     return "Ano de validade inválido.";
+  }
+  if (year === now.getFullYear() && month < now.getMonth() + 1) {
+    return "Cartão vencido.";
   }
   if (!/^\d{3,4}$/.test(fields.cvv)) return "CVV inválido.";
   return null;
@@ -76,9 +88,10 @@ export function PaymentForm({ totalAmount, submitting, error, onSubmit }: Paymen
           <label className="mb-1.5 block text-xs text-text-mute">Número do cartão</label>
           <input
             value={number}
-            onChange={(event) => setNumber(event.target.value)}
+            onChange={(event) => setNumber(formatCardNumber(event.target.value))}
             placeholder="4111 1111 1111 1111"
             inputMode="numeric"
+            autoComplete="off"
             className={inputClassName}
           />
         </div>
@@ -90,6 +103,7 @@ export function PaymentForm({ totalAmount, submitting, error, onSubmit }: Paymen
             value={holderName}
             onChange={(event) => setHolderName(event.target.value)}
             placeholder="Como está no cartão"
+            autoComplete="off"
             className={inputClassName}
           />
         </div>
@@ -98,10 +112,11 @@ export function PaymentForm({ totalAmount, submitting, error, onSubmit }: Paymen
             <label className="mb-1.5 block text-xs text-text-mute">Mês</label>
             <input
               value={expiryMonth}
-              onChange={(event) => setExpiryMonth(event.target.value)}
+              onChange={(event) => setExpiryMonth(event.target.value.replace(/\D/g, "").slice(0, 2))}
               placeholder="12"
               inputMode="numeric"
               maxLength={2}
+              autoComplete="off"
               className={inputClassName}
             />
           </div>
@@ -109,10 +124,11 @@ export function PaymentForm({ totalAmount, submitting, error, onSubmit }: Paymen
             <label className="mb-1.5 block text-xs text-text-mute">Ano</label>
             <input
               value={expiryYear}
-              onChange={(event) => setExpiryYear(event.target.value)}
+              onChange={(event) => setExpiryYear(event.target.value.replace(/\D/g, "").slice(0, 4))}
               placeholder="2030"
               inputMode="numeric"
               maxLength={4}
+              autoComplete="off"
               className={inputClassName}
             />
           </div>
@@ -120,10 +136,11 @@ export function PaymentForm({ totalAmount, submitting, error, onSubmit }: Paymen
             <label className="mb-1.5 block text-xs text-text-mute">CVV</label>
             <input
               value={cvv}
-              onChange={(event) => setCvv(event.target.value)}
+              onChange={(event) => setCvv(event.target.value.replace(/\D/g, "").slice(0, 4))}
               placeholder="123"
               inputMode="numeric"
               maxLength={4}
+              autoComplete="off"
               className={inputClassName}
             />
           </div>

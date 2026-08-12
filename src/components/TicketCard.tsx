@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { appRoutes } from "@/config/routes";
 import { formatEventDateTime } from "@/lib/format";
@@ -10,7 +11,12 @@ const statusConfig: Record<TicketSummary["status"], { label: string; className: 
   CANCELLED: { label: "Cancelado", className: "text-red-400" },
 };
 
-export function TicketCard({ ticket }: { ticket: TicketSummary }) {
+interface TicketCardProps {
+  ticket: TicketSummary;
+  posterUrl?: string | null;
+}
+
+export function TicketCard({ ticket, posterUrl }: TicketCardProps) {
   const status = statusConfig[ticket.status];
 
   return (
@@ -18,8 +24,20 @@ export function TicketCard({ ticket }: { ticket: TicketSummary }) {
       href={appRoutes.ticketDetails(ticket.id)}
       className="flex gap-5 rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent-cyan"
     >
-      <div className="flex h-[126px] w-[88px] flex-none items-center justify-center rounded-xl bg-surface-2 text-center text-[11px] text-text-mute">
-        Sem imagem
+      <div className="relative h-[126px] w-[88px] flex-none overflow-hidden rounded-xl bg-surface-2">
+        {posterUrl ? (
+          <Image
+            src={posterUrl}
+            alt={ticket.event.title}
+            fill
+            sizes="88px"
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-center text-[11px] text-text-mute">
+            Sem imagem
+          </div>
+        )}
       </div>
 
       <div className="flex-1">
@@ -34,15 +52,6 @@ export function TicketCard({ ticket }: { ticket: TicketSummary }) {
         </span>
         <span className={`text-xs font-bold ${status.className}`}>{status.label}</span>
       </div>
-
-      <div
-        aria-hidden
-        className="h-[70px] w-[70px] flex-none self-center rounded-lg"
-        style={{
-          background:
-            "repeating-linear-gradient(45deg, rgba(0,0,0,0.4) 0 4px, var(--surface-2) 4px 8px)",
-        }}
-      />
     </Link>
   );
 }

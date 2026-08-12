@@ -8,6 +8,7 @@ import { QrTicket } from "@/features/tickets/QrTicket";
 import { TicketDetailCard } from "@/features/tickets/TicketDetailCard";
 import { ApiError } from "@/lib/api-client";
 import { getMe } from "@/services/auth";
+import { getPublishedEvent } from "@/services/public-events";
 import { getTicket, shareTicket } from "@/services/tickets";
 import type { TicketDetail } from "@/types/ticket";
 
@@ -18,6 +19,7 @@ export default function TicketDetailsPage() {
   const router = useRouter();
   const [authState, setAuthState] = useState<AuthState>("loading");
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
+  const [posterUrl, setPosterUrl] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shareLink, setShareLink] = useState<string | null>(null);
@@ -33,7 +35,12 @@ export default function TicketDetailsPage() {
 
   useEffect(() => {
     getTicket(params.ticketId)
-      .then((data) => setTicket(data.ticket))
+      .then((data) => {
+        setTicket(data.ticket);
+        getPublishedEvent(data.ticket.event.id)
+          .then((eventData) => setPosterUrl(eventData.event.catalogItem.imageUrl))
+          .catch(() => {});
+      })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 401) {
           router.replace(appRoutes.login);
@@ -140,6 +147,7 @@ export default function TicketDetailsPage() {
 
         <TicketDetailCard
           ticket={ticket}
+          posterUrl={posterUrl}
           actions={
             <div>
               {shareLink ? (

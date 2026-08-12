@@ -57,3 +57,14 @@ export function toDateTimeLocalValue(iso: string): string {
 export function fromDateTimeLocalValue(value: string): string {
   return new Date(value).toISOString();
 }
+
+const ISO_DATE_PATTERN = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g;
+
+/**
+ * Algumas mensagens de erro da API embutem timestamps ISO/UTC crus (ex.:
+ * conflito de horário de evento). Troca por data/hora formatada em pt-BR,
+ * sem mexer no resto do texto.
+ */
+export function formatApiErrorMessage(message: string): string {
+  return message.replace(ISO_DATE_PATTERN, (match) => formatEventDateTime(match));
+}
