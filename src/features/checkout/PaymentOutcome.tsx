@@ -58,7 +58,7 @@ export function PaymentOutcome({ payment, tickets, eventTitle, onRetry }: Paymen
         <button
           type="button"
           onClick={onRetry}
-          className="block w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95"
+          className="block w-full cursor-pointer rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95"
         >
           Escolher assentos novamente
         </button>

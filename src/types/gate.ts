@@ -31,4 +31,9 @@ export interface GateTicketSummary {
 export interface GateValidationResponse {
   result: GateValidationResult;
   ticket: GateTicketSummary | null;
+  // Motivo específico do resultado (ex.: "Entrada ainda não liberada...",
+  // "Sessão encerrada...", "Código não encontrado."). Só o backend decide o
+  // texto — o frontend apenas exibe. Pode vir null quando o resultado já é
+  // autoexplicativo (ex.: VALID).
+  reason: string | null;
 }

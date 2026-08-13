@@ -156,7 +156,7 @@ export default function TicketDetailsPage() {
                   <button
                     type="button"
                     onClick={handleCopy}
-                    className="w-full rounded-[10px] border border-border bg-surface-2 py-3 text-center text-sm font-semibold text-foreground hover:bg-border"
+                    className="w-full cursor-pointer rounded-[10px] border border-border bg-surface-2 py-3 text-center text-sm font-semibold text-foreground hover:bg-border"
                   >
                     Copiar link
                   </button>
@@ -166,7 +166,7 @@ export default function TicketDetailsPage() {
                   type="button"
                   onClick={handleShare}
                   disabled={sharing}
-                  className="w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full cursor-pointer rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {sharing ? "Gerando link..." : "Compartilhar ingresso"}
                 </button>

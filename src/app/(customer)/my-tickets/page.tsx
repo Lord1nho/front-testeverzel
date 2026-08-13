@@ -108,7 +108,7 @@ export default function MyTicketsPage() {
           <button
             type="button"
             onClick={handleLogout}
-            className="text-text-dim hover:text-foreground"
+            className="cursor-pointer text-text-dim hover:text-foreground"
           >
             Sair
           </button>
@@ -121,7 +121,7 @@ export default function MyTicketsPage() {
         <button
           type="button"
           onClick={() => setTab("upcoming")}
-          className={`rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+          className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
             tab === "upcoming"
               ? "bg-accent-lime text-[#05070a]"
               : "border border-border bg-surface text-text-dim hover:border-text-mute"
@@ -132,7 +132,7 @@ export default function MyTicketsPage() {
         <button
           type="button"
           onClick={() => setTab("past")}
-          className={`rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+          className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
             tab === "past"
               ? "bg-accent-lime text-[#05070a]"
               : "border border-border bg-surface text-text-dim hover:border-text-mute"

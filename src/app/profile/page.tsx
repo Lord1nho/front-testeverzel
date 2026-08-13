@@ -137,7 +137,7 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full rounded-2xl border border-border bg-surface px-5 py-4 text-center text-sm font-semibold text-red-400 hover:bg-red-500/10"
+          className="w-full cursor-pointer rounded-2xl border border-border bg-surface px-5 py-4 text-center text-sm font-semibold text-red-400 hover:bg-red-500/10"
         >
           Sair da conta
         </button>
