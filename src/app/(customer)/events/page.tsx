@@ -7,7 +7,7 @@ import { MovieCard } from "@/components/MovieCard";
 import { appRoutes } from "@/config/routes";
 import { EventHero } from "@/features/events/EventHero";
 import { ApiError } from "@/lib/api-client";
-import { groupEventsByMovie } from "@/lib/group-events";
+import { groupEventsByMovie, isMovieFullyEnded } from "@/lib/group-events";
 import { getMe, logout } from "@/services/auth";
 import { listPublishedEvents } from "@/services/public-events";
 import type { UserRole } from "@/types/auth";
@@ -46,7 +46,7 @@ export default function EventsPage() {
 
   const movieGroups = useMemo(() => {
     if (!events) return null;
-    return groupEventsByMovie(events);
+    return groupEventsByMovie(events).filter((group) => !isMovieFullyEnded(group));
   }, [events]);
 
   const heroEvent = movieGroups && movieGroups.length > 0 ? movieGroups[0].sessions[0] : null;
