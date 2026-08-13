@@ -149,7 +149,7 @@ export default function EventDetailsPage() {
                     className={`cursor-pointer rounded-[9px] px-4.5 py-2.5 text-[13px] font-bold transition-colors ${
                       isActive
                         ? "bg-accent-lime text-[#05070a]"
-                        : "border border-border bg-surface text-text-dim hover:border-accent-cyan hover:text-foreground"
+                        : "border border-border bg-surface text-text-dim hover:border-accent-lime hover:text-foreground"
                     }`}
                   >
                     {formatSessionDateLabel(dateGroup.venues[0].sessions[0].startsAt)}

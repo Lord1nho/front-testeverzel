@@ -53,7 +53,7 @@ export function SeatMap({ seats, selectedIds, onToggle, maxSelectable }: SeatMap
                       selected
                         ? "cursor-pointer border-accent-lime bg-accent-lime text-[#05070a]"
                         : available
-                          ? "cursor-pointer border-border bg-surface text-text-dim hover:border-accent-cyan hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                          ? "cursor-pointer border-border bg-surface text-text-dim hover:border-accent-lime hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                           : "cursor-not-allowed border-border bg-surface-2 text-text-mute opacity-50"
                     }`}
                   >

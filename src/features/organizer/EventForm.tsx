@@ -357,7 +357,7 @@ export function EventForm({ eventId }: EventFormProps) {
                     onClick={() => handleSelectMovie(movie)}
                     className={`cursor-pointer overflow-hidden rounded-xl border text-left ${
                       selectedMovie?.tmdbId === movie.tmdbId
-                        ? "border-2 border-accent-cyan"
+                        ? "border-2 border-accent-lime"
                         : "border-border hover:border-text-mute"
                     }`}
                   >
