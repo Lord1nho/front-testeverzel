@@ -3,30 +3,42 @@ import Link from "next/link";
 import { appRoutes } from "@/config/routes";
 import type { MovieGroup } from "@/lib/group-events";
 
+// Prioridade: Encerrado (sessão já terminou) > Esgotado (sem assentos, mas
+// ainda válida) > Em Cartaz (futura ou em andamento). "Em Breve" e "Em
+// Cartaz" foram unificados numa única tag -- não há mais distinção entre
+// sessão futura e em andamento na vitrine.
 function getAvailability(group: MovieGroup) {
-  const purchasable = group.sessions.filter(
-    (session) => session.sessionStatus !== "ENDED" && session.seatsAvailable > 0,
-  );
+  const active = group.sessions.filter((session) => session.sessionStatus !== "ENDED");
 
-  if (purchasable.length === 0) {
-    return { label: "Esgotado", className: "border border-red-500/30 text-red-400", count: 0 };
+  // Todas as sessões desse filme já encerraram -- não deve aparecer na
+  // vitrine (quem chama filtra o grupo inteiro fora quando isso acontece).
+  if (active.length === 0) {
+    return null;
   }
 
-  const label = purchasable.some((session) => session.sessionStatus === "STARTED")
-    ? "Em cartaz"
-    : "Em breve";
-  const className =
-    label === "Em cartaz"
-      ? "bg-accent-cyan text-[#05070a]"
-      : "bg-accent-lime text-[#05070a]";
+  const hasAvailableSeats = active.some((session) => session.seatsAvailable > 0);
 
-  return { label, className, count: purchasable.length };
+  if (!hasAvailableSeats) {
+    return {
+      label: "Esgotado",
+      className: "border border-red-500/30 text-red-400",
+      count: active.length,
+    };
+  }
+
+  return {
+    label: "Em Cartaz",
+    className: "bg-accent-lime text-[#05070a]",
+    count: active.length,
+  };
 }
 
 export function MovieCard({ group }: { group: MovieGroup }) {
   const { catalogItem, sessions } = group;
   const availability = getAvailability(group);
   const primarySession = sessions[0];
+
+  if (!availability) return null;
 
   return (
     <Link

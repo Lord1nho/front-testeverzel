@@ -95,9 +95,9 @@ export default function MyTicketsPage() {
   return (
     <main className="min-h-dvh px-10 py-10">
       <div className="mb-8 flex items-center justify-between border-b border-border pb-5">
-        <span className="font-heading text-lg font-bold">
+        <Link href="/" className="cursor-pointer font-heading text-lg font-bold">
           Cine<span className="text-accent-lime">Verzel</span>
-        </span>
+        </Link>
         <div className="flex items-center gap-5 text-sm">
           <Link href={appRoutes.events} className="text-text-dim hover:text-foreground">
             Eventos

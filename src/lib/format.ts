@@ -25,20 +25,20 @@ export function formatEventDateTime(iso: string): string {
 
 const weekdayFormatter = new Intl.DateTimeFormat("pt-BR", { weekday: "short" });
 
-function startOfDay(date: Date): number {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-}
-
-export function formatSessionDateLabel(iso: string): string {
+/**
+ * Dia da semana + dd/mm de uma sessão, em duas partes separadas para
+ * exibição empilhada (dia da semana em cima, data embaixo).
+ */
+export function formatSessionDateParts(iso: string): { weekday: string; dayMonth: string } {
   const date = new Date(iso);
   const day = String(date.getDate()).padStart(2, "0");
-  const diffDays = Math.round((startOfDay(date) - startOfDay(new Date())) / 86_400_000);
-
-  if (diffDays === 0) return `Hoje, ${day}`;
-  if (diffDays === 1) return `Amanhã, ${day}`;
-
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const weekday = weekdayFormatter.format(date).replace(".", "");
-  return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)}, ${day}`;
+
+  return {
+    weekday: `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)}`,
+    dayMonth: `${day}/${month}`,
+  };
 }
 
 export function formatCurrency(value: number): string {

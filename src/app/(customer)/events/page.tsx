@@ -7,9 +7,10 @@ import { MovieCard } from "@/components/MovieCard";
 import { appRoutes } from "@/config/routes";
 import { EventHero } from "@/features/events/EventHero";
 import { ApiError } from "@/lib/api-client";
-import { groupEventsByMovie } from "@/lib/group-events";
+import { groupEventsByMovie, isMovieFullyEnded } from "@/lib/group-events";
 import { getMe, logout } from "@/services/auth";
 import { listPublishedEvents } from "@/services/public-events";
+import type { UserRole } from "@/types/auth";
 import type { EventSummary } from "@/types/event";
 
 export default function EventsPage() {
@@ -17,6 +18,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState<EventSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
 
   async function handleLogout() {
     await logout().catch(() => {});
@@ -35,13 +37,16 @@ export default function EventsPage() {
 
   useEffect(() => {
     getMe()
-      .then(() => setIsAuthenticated(true))
+      .then(({ user }) => {
+        setIsAuthenticated(true);
+        setRole(user.role);
+      })
       .catch(() => setIsAuthenticated(false));
   }, []);
 
   const movieGroups = useMemo(() => {
     if (!events) return null;
-    return groupEventsByMovie(events);
+    return groupEventsByMovie(events).filter((group) => !isMovieFullyEnded(group));
   }, [events]);
 
   const heroEvent = movieGroups && movieGroups.length > 0 ? movieGroups[0].sessions[0] : null;
@@ -50,9 +55,9 @@ export default function EventsPage() {
     <main className="min-h-dvh">
       <div className="flex items-center justify-between border-b border-border px-10 py-5">
         <div className="flex items-center gap-9">
-          <span className="font-heading text-2xl font-bold tracking-tight">
+          <Link href="/" className="cursor-pointer font-heading text-2xl font-bold tracking-tight">
             Cine<span className="text-accent-lime">Verzel</span>
-          </span>
+          </Link>
           <nav className="text-sm text-text-dim">
             <span className="font-semibold text-foreground">Filmes</span>
           </nav>
@@ -60,6 +65,22 @@ export default function EventsPage() {
         <div className="flex items-center gap-3 text-sm">
           {isAuthenticated === true && (
             <>
+              {role === "CUSTOMER" && (
+                <Link
+                  href={appRoutes.myTickets}
+                  className="cursor-pointer rounded-[9px] px-4 py-2 font-semibold text-text-dim hover:text-foreground"
+                >
+                  Meus ingressos
+                </Link>
+              )}
+              {role === "ORGANIZER" && (
+                <Link
+                  href={appRoutes.organizerEvents}
+                  className="cursor-pointer rounded-[9px] px-4 py-2 font-semibold text-text-dim hover:text-foreground"
+                >
+                  Meus eventos
+                </Link>
+              )}
               <Link
                 href={appRoutes.profile}
                 className="rounded-[9px] border border-border px-4 py-2 font-semibold text-foreground hover:border-text-mute"
@@ -108,7 +129,7 @@ export default function EventsPage() {
         )}
 
         {movieGroups && movieGroups.length > 0 && (
-          <div className="-mx-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-10 pb-3">
+          <div className="custom-scrollbar -mx-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-10 pb-3">
             {movieGroups.map((group) => (
               <div key={group.catalogItem.id} className="snap-start">
                 <MovieCard group={group} />
