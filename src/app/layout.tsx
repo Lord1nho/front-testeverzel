@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import { ToastProvider } from "@/components/toast/ToastProvider";
 import "./globals.css";
@@ -18,6 +18,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Teste Verzel - Eventos e Ingressos",
   description: "Frontend Next.js para a Plataforma de Eventos e Ingressos do teste tecnico Verzel.",
+};
+
+// Mesmo valor de --background em globals.css — mantém a UI do navegador
+// (barra de status, etc.) coerente com o fundo escuro usado em toda a app.
+export const viewport: Viewport = {
+  themeColor: "#0b0d10",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
