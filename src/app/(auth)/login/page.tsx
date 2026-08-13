@@ -12,7 +12,14 @@ export default function LoginPage() {
   const toast = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordHasSpace, setPasswordHasSpace] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function handlePasswordChange(rawValue: string) {
+    const withoutSpaces = rawValue.replace(/\s/g, "");
+    setPassword(withoutSpaces);
+    setPasswordHasSpace(rawValue !== withoutSpaces);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -78,10 +85,15 @@ export default function LoginPage() {
               type="password"
               required
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => handlePasswordChange(event.target.value)}
               placeholder="********"
               className="w-full rounded-[9px] border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none placeholder:text-text-dim focus:border-accent-cyan"
             />
+            {passwordHasSpace && (
+              <p className="mt-1.5 text-xs text-red-400">
+                A senha não pode conter espaços.
+              </p>
+            )}
           </div>
 
           <button
