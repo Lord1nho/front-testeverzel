@@ -1,11 +1,37 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState, type FormEvent } from "react";
 import { roleHomeRoute } from "@/config/routes";
 import { ApiError } from "@/lib/api-client";
 import { useToast } from "@/components/toast/ToastProvider";
 import { login } from "@/services/auth";
+
+// Só aceita caminho interno (começa com "/" e não com "//") -- evita que um
+// link de login com ?from= forjado mande o usuário pra fora da aplicação
+// depois que ele clicar em "voltar".
+function safeInternalPath(value: string | null): string | null {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return null;
+  return value;
+}
+
+// useSearchParams precisa de um Suspense boundary pra não quebrar a
+// pré-renderização estática da página (ver docs do Next) -- isolado aqui
+// pra não forçar o resto do formulário a virar client-side-only por causa
+// só desse link.
+function BackToOriginLink() {
+  const searchParams = useSearchParams();
+  const from = safeInternalPath(searchParams.get("from"));
+
+  if (!from) return null;
+
+  return (
+    <Link href={from} className="mb-6 inline-block text-sm text-text-dim hover:text-foreground">
+      ← Voltar para o evento
+    </Link>
+  );
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,9 +67,12 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-dvh items-center justify-center px-6 py-16">
       <div className="w-full max-w-sm">
-        <span className="mb-9 block font-heading text-xl font-bold">
+        <Suspense fallback={null}>
+          <BackToOriginLink />
+        </Suspense>
+        <Link href="/" className="mb-9 block cursor-pointer font-heading text-xl font-bold">
           Cine<span className="text-accent-lime">Verzel</span>
-        </span>
+        </Link>
 
         <h1 className="mb-2 font-heading text-[26px] font-bold">
           Bem-vindo de volta

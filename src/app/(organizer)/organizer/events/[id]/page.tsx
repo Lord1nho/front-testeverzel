@@ -16,7 +16,7 @@ export default async function EditOrganizerEventPage({
           href={appRoutes.organizerEvents}
           className="text-sm text-text-dim hover:text-foreground"
         >
-          ← Meus eventos
+          ← Voltar aos eventos
         </Link>
         <span className="font-heading text-lg font-bold">Editar evento</span>
       </div>

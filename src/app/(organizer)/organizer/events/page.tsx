@@ -75,7 +75,9 @@ export default function OrganizerEventsPage() {
       <div className="mb-8 flex items-center justify-between border-b border-border pb-5">
         <div className="flex items-center gap-9">
           <span className="font-heading text-lg font-bold">
-            Cine<span className="text-accent-lime">Verzel</span>{" "}
+            <Link href="/" className="cursor-pointer">
+              Cine<span className="text-accent-lime">Verzel</span>
+            </Link>{" "}
             <span className="text-xs font-medium text-text-mute">
               Organizador
             </span>

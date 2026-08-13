@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { appRoutes } from "@/config/routes";
+import { appRoutes, loginWithOrigin } from "@/config/routes";
 import { useToast } from "@/components/toast/ToastProvider";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { formatCurrency, formatEventDateTime } from "@/lib/format";
@@ -308,7 +308,10 @@ export default function CheckoutPage() {
         {sessionExpired && (
           <p className="mb-6 max-w-xl rounded-[9px] border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
             Sua sessão expirou.{" "}
-            <Link href={appRoutes.login} className="font-semibold text-accent-cyan hover:text-accent-lime">
+            <Link
+              href={loginWithOrigin(appRoutes.checkout(eventId))}
+              className="font-semibold text-accent-cyan hover:text-accent-lime"
+            >
               Entrar novamente
             </Link>
           </p>
@@ -410,7 +413,7 @@ export default function CheckoutPage() {
           selectedSeats={selectedSeats}
           pricePerSeat={event.price}
           submitting={submitting}
-          loginHref={authState === "guest" ? appRoutes.login : undefined}
+          loginHref={authState === "guest" ? loginWithOrigin(appRoutes.checkout(eventId)) : undefined}
           blockedReason={authState !== "guest" ? blockedReason : null}
           onConfirm={handleConfirm}
         />
