@@ -129,7 +129,7 @@ export default function EventsPage() {
         )}
 
         {movieGroups && movieGroups.length > 0 && (
-          <div className="-mx-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-10 pb-3">
+          <div className="custom-scrollbar -mx-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-10 pb-3">
             {movieGroups.map((group) => (
               <div key={group.catalogItem.id} className="snap-start">
                 <MovieCard group={group} />
