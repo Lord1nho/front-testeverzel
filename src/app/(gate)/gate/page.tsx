@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { appRoutes } from "@/config/routes";
 import { useToast } from "@/components/toast/ToastProvider";
 import { GateValidationForm } from "@/features/gate/GateValidationForm";
+import { QrCodeScanner } from "@/features/gate/QrCodeScanner";
 import { ValidationResult } from "@/features/gate/ValidationResult";
 import { ApiError } from "@/lib/api-client";
 import { formatEventDateTime } from "@/lib/format";
@@ -15,12 +16,15 @@ import { findTicketEvent, validateTicket } from "@/services/gate";
 import type { GateEventLookup, GateValidationResponse } from "@/types/gate";
 
 type AuthState = "loading" | "guest" | "wrong-role" | "gate";
+type InputMode = "scan" | "manual";
 
 export default function GatePage() {
   const router = useRouter();
   const toast = useToast();
   const [authState, setAuthState] = useState<AuthState>("loading");
+  const [inputMode, setInputMode] = useState<InputMode>("scan");
   const [code, setCode] = useState("");
+  const [token, setToken] = useState<string | undefined>(undefined);
   const [resolvedEvent, setResolvedEvent] = useState<GateEventLookup | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<GateValidationResponse | null>(null);
@@ -52,7 +56,7 @@ export default function GatePage() {
   // pertence — ainda não consome o ingresso (findTicketEvent é leitura
   // pura no backend). O porteiro confere a sessão exibida antes de
   // confirmar a entrada na etapa 2.
-  async function handleLookup(submittedCode: string) {
+  async function handleLookup(submittedCode: string, submittedToken?: string) {
     setSubmitting(true);
     setResult(null);
 
@@ -65,16 +69,28 @@ export default function GatePage() {
       if (!resolved) {
         setResult({ result: "INVALID", ticket: null });
         setCode("");
+        setToken(undefined);
         return;
       }
 
       setResolvedEvent(resolved.event);
       setCode(submittedCode);
+      setToken(submittedToken);
     } catch (err) {
       handleAuthOrGenericError(err, "Não foi possível buscar o ingresso.");
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // O QR do ingresso codifica "<code>.<hmac>" (ver QrTicket.tsx) — a câmera
+  // devolve essa string crua. Separa as duas partes aqui antes de seguir
+  // pro mesmo fluxo da digitação manual; o hmac (token) só existe nesse
+  // caminho e é o que permite o backend confirmar que o QR não foi forjado.
+  function handleScanDetect(rawValue: string) {
+    const [scannedCode, scannedToken] = rawValue.split(".");
+    if (!scannedCode) return;
+    handleLookup(scannedCode, scannedToken);
   }
 
   // Etapa 2: só aqui o ingresso é de fato validado (e marcado como
@@ -85,10 +101,11 @@ export default function GatePage() {
     setSubmitting(true);
 
     try {
-      const response = await validateTicket({ eventId: resolvedEvent.id, code });
+      const response = await validateTicket({ eventId: resolvedEvent.id, code, token });
       setResult(response);
       setResolvedEvent(null);
       setCode("");
+      setToken(undefined);
     } catch (err) {
       handleAuthOrGenericError(err, "Não foi possível validar o ingresso.");
     } finally {
@@ -100,6 +117,7 @@ export default function GatePage() {
   function handleCancelLookup() {
     setResolvedEvent(null);
     setCode("");
+    setToken(undefined);
     inputRef.current?.focus();
   }
 
@@ -177,15 +195,46 @@ export default function GatePage() {
             </button>
           </div>
         ) : (
-          <GateValidationForm
-            code={code}
-            onCodeChange={setCode}
-            submitting={submitting}
-            onSubmit={handleLookup}
-            inputRef={inputRef}
-            submitLabel="Buscar sessão"
-            submittingLabel="Buscando..."
-          />
+          <>
+            <div className="flex gap-2.5">
+              <button
+                type="button"
+                onClick={() => setInputMode("scan")}
+                className={`flex-1 rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+                  inputMode === "scan"
+                    ? "bg-accent-lime text-[#05070a]"
+                    : "border border-border bg-surface text-text-dim hover:border-text-mute"
+                }`}
+              >
+                Escanear código
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputMode("manual")}
+                className={`flex-1 rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+                  inputMode === "manual"
+                    ? "bg-accent-lime text-[#05070a]"
+                    : "border border-border bg-surface text-text-dim hover:border-text-mute"
+                }`}
+              >
+                Digitar código
+              </button>
+            </div>
+
+            {inputMode === "scan" ? (
+              <QrCodeScanner onDetect={handleScanDetect} paused={submitting} />
+            ) : (
+              <GateValidationForm
+                code={code}
+                onCodeChange={setCode}
+                submitting={submitting}
+                onSubmit={handleLookup}
+                inputRef={inputRef}
+                submitLabel="Buscar sessão"
+                submittingLabel="Buscando..."
+              />
+            )}
+          </>
         )}
 
         {result && <ValidationResult response={result} />}
