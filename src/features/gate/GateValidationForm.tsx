@@ -50,7 +50,7 @@ export function GateValidationForm({
       <button
         type="submit"
         disabled={submitting || !code.trim()}
-        className="mt-4 w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 w-full cursor-pointer rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {submitting ? submittingLabel : submitLabel}
       </button>

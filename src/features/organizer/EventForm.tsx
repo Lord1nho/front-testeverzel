@@ -355,9 +355,9 @@ export function EventForm({ eventId }: EventFormProps) {
                     key={movie.tmdbId}
                     type="button"
                     onClick={() => handleSelectMovie(movie)}
-                    className={`overflow-hidden rounded-xl border text-left ${
+                    className={`cursor-pointer overflow-hidden rounded-xl border text-left ${
                       selectedMovie?.tmdbId === movie.tmdbId
-                        ? "border-2 border-accent-cyan"
+                        ? "border-2 border-accent-lime"
                         : "border-border hover:border-text-mute"
                     }`}
                   >
@@ -532,7 +532,7 @@ export function EventForm({ eventId }: EventFormProps) {
               type="button"
               disabled={submitting}
               onClick={handleSaveChanges}
-              className="mb-2.5 w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:opacity-60"
+              className="mb-2.5 w-full cursor-pointer rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Salvar alterações
             </button>
@@ -541,7 +541,7 @@ export function EventForm({ eventId }: EventFormProps) {
                 type="button"
                 disabled={submitting}
                 onClick={handlePublishExisting}
-                className="mb-2.5 w-full rounded-[10px] border border-border bg-surface-2 py-3.5 text-center text-sm font-semibold text-foreground hover:bg-border disabled:opacity-60"
+                className="mb-2.5 w-full cursor-pointer rounded-[10px] border border-border bg-surface-2 py-3.5 text-center text-sm font-semibold text-foreground hover:bg-border disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Publicar evento
               </button>
@@ -550,7 +550,7 @@ export function EventForm({ eventId }: EventFormProps) {
               type="button"
               disabled={submitting}
               onClick={handleDelete}
-              className="w-full rounded-[10px] border border-red-500/30 bg-red-500/10 py-3 text-center text-sm font-semibold text-red-400 hover:bg-red-500/20 disabled:opacity-60"
+              className="w-full cursor-pointer rounded-[10px] border border-red-500/30 bg-red-500/10 py-3 text-center text-sm font-semibold text-red-400 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Excluir evento
             </button>
@@ -561,7 +561,7 @@ export function EventForm({ eventId }: EventFormProps) {
               type="button"
               disabled={submitting}
               onClick={() => handleCreate(true)}
-              className="mb-2.5 w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:opacity-60"
+              className="mb-2.5 w-full cursor-pointer rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Publicar evento
             </button>
@@ -569,7 +569,7 @@ export function EventForm({ eventId }: EventFormProps) {
               type="button"
               disabled={submitting}
               onClick={() => handleCreate(false)}
-              className="w-full rounded-[10px] border border-border bg-surface-2 py-3.5 text-center text-sm font-semibold text-foreground hover:bg-border disabled:opacity-60"
+              className="w-full cursor-pointer rounded-[10px] border border-border bg-surface-2 py-3.5 text-center text-sm font-semibold text-foreground hover:bg-border disabled:cursor-not-allowed disabled:opacity-60"
             >
               Salvar como rascunho
             </button>

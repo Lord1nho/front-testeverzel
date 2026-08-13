@@ -295,7 +295,7 @@ export default function CheckoutPage() {
         <button
           type="button"
           onClick={handleBackFromPayment}
-          className="mb-8 inline-block text-sm text-text-dim hover:text-foreground"
+          className="mb-8 inline-block cursor-pointer text-sm text-text-dim hover:text-foreground"
         >
           ← Voltar para o evento
         </button>
@@ -353,7 +353,7 @@ export default function CheckoutPage() {
               type="button"
               onClick={handleCancel}
               disabled={cancelling}
-              className="text-sm text-text-dim hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="cursor-pointer text-sm text-text-dim hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {cancelling ? "Cancelando..." : "Cancelar reserva"}
             </button>

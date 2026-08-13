@@ -34,11 +34,13 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
-a {
-  color: var(--accent-cyan);
-}
-a:hover {
-  color: var(--accent-lime);
+@layer base {
+  a {
+    color: var(--accent-cyan);
+  }
+  a:hover {
+    color: var(--accent-lime);
+  }
 }
 
 .session-flip {

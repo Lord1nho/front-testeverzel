@@ -95,7 +95,7 @@ export default function OrganizerEventsPage() {
           <button
             type="button"
             onClick={handleLogout}
-            className="text-sm text-text-dim hover:text-foreground"
+            className="cursor-pointer text-sm text-text-dim hover:text-foreground"
           >
             Sair
           </button>
@@ -114,7 +114,7 @@ export default function OrganizerEventsPage() {
         <button
           type="button"
           onClick={() => setTab("mine")}
-          className={`rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+          className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
             tab === "mine"
               ? "bg-accent-lime text-[#05070a]"
               : "border border-border bg-surface text-text-dim hover:border-text-mute"
@@ -125,7 +125,7 @@ export default function OrganizerEventsPage() {
         <button
           type="button"
           onClick={() => setTab("all")}
-          className={`rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+          className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
             tab === "all"
               ? "bg-accent-lime text-[#05070a]"
               : "border border-border bg-surface text-text-dim hover:border-text-mute"
