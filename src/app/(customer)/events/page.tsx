@@ -68,7 +68,7 @@ export default function EventsPage() {
               {role === "CUSTOMER" && (
                 <Link
                   href={appRoutes.myTickets}
-                  className="cursor-pointer rounded-[9px] px-4 py-2 font-semibold text-text-dim hover:text-foreground"
+                  className="cursor-pointer rounded-[9px] border border-border bg-surface-2 px-4 py-2 font-semibold text-foreground shadow-sm shadow-black/30 transition-colors hover:border-text-mute hover:bg-border"
                 >
                   Meus ingressos
                 </Link>
@@ -76,7 +76,7 @@ export default function EventsPage() {
               {role === "ORGANIZER" && (
                 <Link
                   href={appRoutes.organizerEvents}
-                  className="cursor-pointer rounded-[9px] px-4 py-2 font-semibold text-text-dim hover:text-foreground"
+                  className="cursor-pointer rounded-[9px] border border-border bg-surface-2 px-4 py-2 font-semibold text-foreground shadow-sm shadow-black/30 transition-colors hover:border-text-mute hover:bg-border"
                 >
                   Meus eventos
                 </Link>
