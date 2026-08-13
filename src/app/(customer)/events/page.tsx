@@ -50,9 +50,9 @@ export default function EventsPage() {
     <main className="min-h-dvh">
       <div className="flex items-center justify-between border-b border-border px-10 py-5">
         <div className="flex items-center gap-9">
-          <span className="font-heading text-2xl font-bold tracking-tight">
+          <Link href="/" className="cursor-pointer font-heading text-2xl font-bold tracking-tight">
             Cine<span className="text-accent-lime">Verzel</span>
-          </span>
+          </Link>
           <nav className="text-sm text-text-dim">
             <span className="font-semibold text-foreground">Filmes</span>
           </nav>
