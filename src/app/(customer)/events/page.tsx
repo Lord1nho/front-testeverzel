@@ -10,6 +10,7 @@ import { ApiError } from "@/lib/api-client";
 import { groupEventsByMovie } from "@/lib/group-events";
 import { getMe, logout } from "@/services/auth";
 import { listPublishedEvents } from "@/services/public-events";
+import type { UserRole } from "@/types/auth";
 import type { EventSummary } from "@/types/event";
 
 export default function EventsPage() {
@@ -17,6 +18,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState<EventSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
 
   async function handleLogout() {
     await logout().catch(() => {});
@@ -35,7 +37,10 @@ export default function EventsPage() {
 
   useEffect(() => {
     getMe()
-      .then(() => setIsAuthenticated(true))
+      .then(({ user }) => {
+        setIsAuthenticated(true);
+        setRole(user.role);
+      })
       .catch(() => setIsAuthenticated(false));
   }, []);
 
@@ -60,6 +65,22 @@ export default function EventsPage() {
         <div className="flex items-center gap-3 text-sm">
           {isAuthenticated === true && (
             <>
+              {role === "CUSTOMER" && (
+                <Link
+                  href={appRoutes.myTickets}
+                  className="cursor-pointer rounded-[9px] px-4 py-2 font-semibold text-text-dim hover:text-foreground"
+                >
+                  Meus ingressos
+                </Link>
+              )}
+              {role === "ORGANIZER" && (
+                <Link
+                  href={appRoutes.organizerEvents}
+                  className="cursor-pointer rounded-[9px] px-4 py-2 font-semibold text-text-dim hover:text-foreground"
+                >
+                  Meus eventos
+                </Link>
+              )}
               <Link
                 href={appRoutes.profile}
                 className="rounded-[9px] border border-border px-4 py-2 font-semibold text-foreground hover:border-text-mute"
