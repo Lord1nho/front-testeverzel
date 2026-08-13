@@ -152,20 +152,28 @@ export default function GatePage() {
   }
 
   return (
-    <main className="min-h-dvh px-10 py-10">
-      <div className="mb-8 flex items-center justify-between border-b border-border pb-5">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="cursor-pointer font-heading text-lg font-bold">
+    <main className="min-h-dvh">
+      <div className="flex items-center justify-between border-b border-border px-10 py-5">
+        <div className="flex items-center gap-9">
+          <Link href="/" className="cursor-pointer font-heading text-2xl font-bold tracking-tight">
             Cine<span className="text-accent-lime">Verzel</span>
           </Link>
-          <span className="text-xs font-medium text-text-mute">Portaria</span>
+          <nav className="text-sm text-text-dim">
+            <span className="font-semibold text-foreground">Portaria</span>
+          </nav>
         </div>
-        <button type="button" onClick={handleLogout} className="cursor-pointer text-sm text-text-dim hover:text-foreground">
-          Sair
-        </button>
+        <div className="flex items-center gap-3 text-sm">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="cursor-pointer rounded-[9px] px-4 py-2 font-semibold text-text-dim hover:text-foreground"
+          >
+            Sair
+          </button>
+        </div>
       </div>
 
-      <div className="mx-auto flex max-w-md flex-col gap-5">
+      <div className="mx-auto flex max-w-md flex-col gap-5 px-10 py-10">
         {resolvedEvent ? (
           <div className="rounded-2xl border border-border bg-surface p-6">
             <span className="mb-1.5 block text-xs text-text-mute">Sessão do ingresso</span>

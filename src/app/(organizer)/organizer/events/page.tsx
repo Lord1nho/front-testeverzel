@@ -71,147 +71,144 @@ export default function OrganizerEventsPage() {
   }, [tab, toast]);
 
   return (
-    <main className="min-h-dvh px-10 py-10">
-      <div className="mb-8 flex items-center justify-between border-b border-border pb-5">
+    <main className="min-h-dvh">
+      <div className="flex items-center justify-between border-b border-border px-10 py-5">
         <div className="flex items-center gap-9">
-          <span className="font-heading text-lg font-bold">
-            <Link href="/" className="cursor-pointer">
-              Cine<span className="text-accent-lime">Verzel</span>
-            </Link>{" "}
-            <span className="text-xs font-medium text-text-mute">
-              Organizador
-            </span>
-          </span>
-          <nav className="flex gap-7 text-sm text-text-dim">
-            <span className="text-foreground">Meus eventos</span>
+          <Link href="/" className="cursor-pointer font-heading text-2xl font-bold tracking-tight">
+            Cine<span className="text-accent-lime">Verzel</span>
+          </Link>
+          <nav className="flex items-center gap-7 text-sm text-text-dim">
+            <span className="font-semibold text-foreground">Organizador</span>
             <span>Relatórios</span>
           </nav>
         </div>
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 text-sm">
           <Link
             href={appRoutes.profile}
-            className="text-sm text-text-dim hover:text-foreground"
+            className="rounded-[9px] border border-border px-4 py-2 font-semibold text-foreground hover:border-text-mute"
           >
             Perfil
           </Link>
           <button
             type="button"
             onClick={handleLogout}
-            className="cursor-pointer text-sm text-text-dim hover:text-foreground"
+            className="cursor-pointer rounded-[9px] px-4 py-2 font-semibold text-text-dim hover:text-foreground"
           >
             Sair
           </button>
           <Link
             href={appRoutes.organizerEventNew}
-            className="rounded-lg bg-accent-lime px-4.5 py-2.5 text-sm font-bold text-[#05070a] hover:brightness-95"
+            className="rounded-[9px] bg-accent-lime px-4 py-2 font-bold text-[#05070a] hover:brightness-95"
           >
             + Novo evento
           </Link>
         </div>
       </div>
 
-      <h1 className="mb-5 font-heading text-2xl font-bold">Meus eventos</h1>
+      <div className="px-10 py-10">
+        <h1 className="mb-5 font-heading text-2xl font-bold">Meus eventos</h1>
 
-      <div className="mb-6 flex gap-2.5">
-        <button
-          type="button"
-          onClick={() => setTab("mine")}
-          className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
-            tab === "mine"
-              ? "bg-accent-lime text-[#05070a]"
-              : "border border-border bg-surface text-text-dim hover:border-text-mute"
-          }`}
-        >
-          Meus eventos
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("all")}
-          className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
-            tab === "all"
-              ? "bg-accent-lime text-[#05070a]"
-              : "border border-border bg-surface text-text-dim hover:border-text-mute"
-          }`}
-        >
-          Todos os eventos
-        </button>
-      </div>
-
-      {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
-
-      {!events && !error && (
-        <p className="text-sm text-text-dim">Carregando eventos...</p>
-      )}
-
-      {events && now !== null && (
-        <div className="overflow-hidden rounded-xl border border-border">
-          <div className="grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] gap-2 border-b border-border bg-surface px-5 py-3.5 text-xs font-semibold text-text-mute">
-            <span>Evento</span>
-            <span>Data</span>
-            <span>Cinema / Sala</span>
-            <span>Capacidade</span>
-            <span>Preço</span>
-            <span>Status</span>
-            <span />
-          </div>
-
-          {events.map((event) => {
-            const statusLabel = getStatusLabel(event);
-            const editable = new Date(event.startsAt).getTime() > now;
-
-            return (
-              <div
-                key={event.id}
-                className={`grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] items-center gap-2 border-b border-border px-5 py-4 text-sm last:border-b-0 ${
-                  editable ? "" : "opacity-55"
-                }`}
-              >
-                <span className="font-semibold">{event.title}</span>
-                <span className="text-text-dim">
-                  {formatEventDateTime(event.startsAt)}
-                </span>
-                <span className="text-text-dim">
-                  {venueLabels[event.venue]} · Sala {event.room}
-                </span>
-                <span className="text-text-dim">
-                  {event.seatsAvailable} / {event.capacity}
-                </span>
-                <span className="text-text-dim">
-                  {formatCurrency(event.price)}
-                </span>
-                <span
-                  className={`w-fit rounded-md px-2.5 py-1 text-xs font-bold ${statusClassName[statusLabel]}`}
-                >
-                  {statusLabel}
-                </span>
-                {tab === "all" ? (
-                  <Link
-                    href={appRoutes.checkout(event.id)}
-                    className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
-                  >
-                    Ver
-                  </Link>
-                ) : editable ? (
-                  <Link
-                    href={appRoutes.organizerEventDetails(event.id)}
-                    className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
-                  >
-                    Editar
-                  </Link>
-                ) : (
-                  <span className="text-sm text-text-mute">—</span>
-                )}
-              </div>
-            );
-          })}
-
-          {events.length === 0 && (
-            <p className="px-5 py-8 text-center text-sm text-text-dim">
-              Nenhum evento criado ainda.
-            </p>
-          )}
+        <div className="mb-6 flex gap-2.5">
+          <button
+            type="button"
+            onClick={() => setTab("mine")}
+            className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+              tab === "mine"
+                ? "bg-accent-lime text-[#05070a]"
+                : "border border-border bg-surface text-text-dim hover:border-text-mute"
+            }`}
+          >
+            Meus eventos
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("all")}
+            className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+              tab === "all"
+                ? "bg-accent-lime text-[#05070a]"
+                : "border border-border bg-surface text-text-dim hover:border-text-mute"
+            }`}
+          >
+            Todos os eventos
+          </button>
         </div>
-      )}
+
+        {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
+
+        {!events && !error && (
+          <p className="text-sm text-text-dim">Carregando eventos...</p>
+        )}
+
+        {events && now !== null && (
+          <div className="overflow-hidden rounded-xl border border-border">
+            <div className="grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] gap-2 border-b border-border bg-surface px-5 py-3.5 text-xs font-semibold text-text-mute">
+              <span>Evento</span>
+              <span>Data</span>
+              <span>Cinema / Sala</span>
+              <span>Capacidade</span>
+              <span>Preço</span>
+              <span>Status</span>
+              <span />
+            </div>
+
+            {events.map((event) => {
+              const statusLabel = getStatusLabel(event);
+              const editable = new Date(event.startsAt).getTime() > now;
+
+              return (
+                <div
+                  key={event.id}
+                  className={`grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] items-center gap-2 border-b border-border px-5 py-4 text-sm last:border-b-0 ${
+                    editable ? "" : "opacity-55"
+                  }`}
+                >
+                  <span className="font-semibold">{event.title}</span>
+                  <span className="text-text-dim">
+                    {formatEventDateTime(event.startsAt)}
+                  </span>
+                  <span className="text-text-dim">
+                    {venueLabels[event.venue]} · Sala {event.room}
+                  </span>
+                  <span className="text-text-dim">
+                    {event.seatsAvailable} / {event.capacity}
+                  </span>
+                  <span className="text-text-dim">
+                    {formatCurrency(event.price)}
+                  </span>
+                  <span
+                    className={`w-fit rounded-md px-2.5 py-1 text-xs font-bold ${statusClassName[statusLabel]}`}
+                  >
+                    {statusLabel}
+                  </span>
+                  {tab === "all" ? (
+                    <Link
+                      href={appRoutes.checkout(event.id)}
+                      className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
+                    >
+                      Ver
+                    </Link>
+                  ) : editable ? (
+                    <Link
+                      href={appRoutes.organizerEventDetails(event.id)}
+                      className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
+                    >
+                      Editar
+                    </Link>
+                  ) : (
+                    <span className="text-sm text-text-mute">—</span>
+                  )}
+                </div>
+              );
+            })}
+
+            {events.length === 0 && (
+              <p className="px-5 py-8 text-center text-sm text-text-dim">
+                Nenhum evento criado ainda.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </main>
   );
 }

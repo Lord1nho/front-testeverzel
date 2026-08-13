@@ -93,82 +93,95 @@ export default function MyTicketsPage() {
   }
 
   return (
-    <main className="min-h-dvh px-10 py-10">
-      <div className="mb-8 flex items-center justify-between border-b border-border pb-5">
-        <Link href="/" className="cursor-pointer font-heading text-lg font-bold">
-          Cine<span className="text-accent-lime">Verzel</span>
-        </Link>
-        <div className="flex items-center gap-5 text-sm">
-          <Link href={appRoutes.events} className="text-text-dim hover:text-foreground">
+    <main className="min-h-dvh">
+      <div className="flex items-center justify-between border-b border-border px-10 py-5">
+        <div className="flex items-center gap-9">
+          <Link href="/" className="cursor-pointer font-heading text-2xl font-bold tracking-tight">
+            Cine<span className="text-accent-lime">Verzel</span>
+          </Link>
+          <nav className="text-sm text-text-dim">
+            <span className="font-semibold text-foreground">Meus ingressos</span>
+          </nav>
+        </div>
+        <div className="flex items-center gap-3 text-sm">
+          <Link
+            href={appRoutes.events}
+            className="cursor-pointer rounded-[9px] border border-border bg-surface-2 px-4 py-2 font-semibold text-foreground shadow-sm shadow-black/30 transition-colors hover:border-text-mute hover:bg-border"
+          >
             Eventos
           </Link>
-          <Link href={appRoutes.profile} className="text-text-dim hover:text-foreground">
+          <Link
+            href={appRoutes.profile}
+            className="rounded-[9px] border border-border px-4 py-2 font-semibold text-foreground hover:border-text-mute"
+          >
             Perfil
           </Link>
           <button
             type="button"
             onClick={handleLogout}
-            className="cursor-pointer text-text-dim hover:text-foreground"
+            className="cursor-pointer rounded-[9px] px-4 py-2 font-semibold text-text-dim hover:text-foreground"
           >
             Sair
           </button>
         </div>
       </div>
 
-      <h1 className="mb-6 font-heading text-2xl font-bold">Meus ingressos</h1>
+      <div className="px-10 py-10">
+        <h1 className="mb-6 font-heading text-2xl font-bold">Meus ingressos</h1>
 
-      <div className="mb-7 flex gap-2.5">
-        <button
-          type="button"
-          onClick={() => setTab("upcoming")}
-          className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
-            tab === "upcoming"
-              ? "bg-accent-lime text-[#05070a]"
-              : "border border-border bg-surface text-text-dim hover:border-text-mute"
-          }`}
-        >
-          Próximos
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("past")}
-          className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
-            tab === "past"
-              ? "bg-accent-lime text-[#05070a]"
-              : "border border-border bg-surface text-text-dim hover:border-text-mute"
-          }`}
-        >
-          Anteriores
-        </button>
-      </div>
-
-      {error && (
-        <p className="mb-4 rounded-[9px] border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
-          {error}
-        </p>
-      )}
-
-      {!filteredTickets && !error && (
-        <p className="text-sm text-text-dim">Carregando ingressos...</p>
-      )}
-
-      {filteredTickets && filteredTickets.length === 0 && (
-        <p className="rounded-xl border border-border bg-surface px-5 py-10 text-center text-sm text-text-dim">
-          Nenhum ingresso {tab === "upcoming" ? "próximo" : "anterior"} encontrado.
-        </p>
-      )}
-
-      {filteredTickets && filteredTickets.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {filteredTickets.map((ticket) => (
-            <TicketCard
-              key={ticket.id}
-              ticket={ticket}
-              posterUrl={posters[ticket.event.id] ?? null}
-            />
-          ))}
+        <div className="mb-7 flex gap-2.5">
+          <button
+            type="button"
+            onClick={() => setTab("upcoming")}
+            className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+              tab === "upcoming"
+                ? "bg-accent-lime text-[#05070a]"
+                : "border border-border bg-surface text-text-dim hover:border-text-mute"
+            }`}
+          >
+            Próximos
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("past")}
+            className={`cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+              tab === "past"
+                ? "bg-accent-lime text-[#05070a]"
+                : "border border-border bg-surface text-text-dim hover:border-text-mute"
+            }`}
+          >
+            Anteriores
+          </button>
         </div>
-      )}
+
+        {error && (
+          <p className="mb-4 rounded-[9px] border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+            {error}
+          </p>
+        )}
+
+        {!filteredTickets && !error && (
+          <p className="text-sm text-text-dim">Carregando ingressos...</p>
+        )}
+
+        {filteredTickets && filteredTickets.length === 0 && (
+          <p className="rounded-xl border border-border bg-surface px-5 py-10 text-center text-sm text-text-dim">
+            Nenhum ingresso {tab === "upcoming" ? "próximo" : "anterior"} encontrado.
+          </p>
+        )}
+
+        {filteredTickets && filteredTickets.length > 0 && (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {filteredTickets.map((ticket) => (
+              <TicketCard
+                key={ticket.id}
+                ticket={ticket}
+                posterUrl={posters[ticket.event.id] ?? null}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </main>
   );
 }
