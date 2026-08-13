@@ -481,15 +481,20 @@ export function EventForm({ eventId }: EventFormProps) {
             <label className="mb-1.5 block text-xs text-text-mute">
               Preço do ingresso
             </label>
-            <input
-              type="number"
-              min={0}
-              step="0.01"
-              value={price}
-              onChange={(event) => setPrice(event.target.value)}
-              placeholder="35.50"
-              className={inputClassName}
-            />
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-text-mute">
+                R$
+              </span>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                value={price}
+                onChange={(event) => setPrice(event.target.value)}
+                placeholder="35.50"
+                className="w-full rounded-[9px] border border-border bg-surface py-3 pl-10 pr-4 text-sm text-foreground outline-none placeholder:text-text-dim focus:border-accent-cyan"
+              />
+            </div>
           </div>
         </div>
       </div>
