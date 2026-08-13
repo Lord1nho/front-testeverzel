@@ -67,7 +67,7 @@ export default function GatePage() {
       });
 
       if (!resolved) {
-        setResult({ result: "INVALID", ticket: null });
+        setResult({ result: "INVALID", ticket: null, reason: "Código não encontrado." });
         setCode("");
         setToken(undefined);
         return;
