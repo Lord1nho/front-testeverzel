@@ -97,7 +97,7 @@ export function ValidationResult({ response }: ValidationResultProps) {
   return (
     <div
       className={`rounded-2xl border bg-surface p-6 text-center ${
-        valid ? "border-2 border-accent-green" : "border-border"
+        valid ? "border-[3px] border-accent-green" : "border-red-400"
       }`}
     >
       <div className="mx-auto mb-4 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-surface-2">
