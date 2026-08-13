@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { appRoutes } from "@/config/routes";
 import { useToast } from "@/components/toast/ToastProvider";
 import { GateValidationForm } from "@/features/gate/GateValidationForm";
+import { QrCodeScanner } from "@/features/gate/QrCodeScanner";
 import { ValidationResult } from "@/features/gate/ValidationResult";
 import { ApiError } from "@/lib/api-client";
 import { formatEventDateTime } from "@/lib/format";
@@ -15,11 +16,13 @@ import { findTicketEvent, validateTicket } from "@/services/gate";
 import type { GateEventLookup, GateValidationResponse } from "@/types/gate";
 
 type AuthState = "loading" | "guest" | "wrong-role" | "gate";
+type InputMode = "scan" | "manual";
 
 export default function GatePage() {
   const router = useRouter();
   const toast = useToast();
   const [authState, setAuthState] = useState<AuthState>("loading");
+  const [inputMode, setInputMode] = useState<InputMode>("scan");
   const [code, setCode] = useState("");
   const [resolvedEvent, setResolvedEvent] = useState<GateEventLookup | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -177,15 +180,46 @@ export default function GatePage() {
             </button>
           </div>
         ) : (
-          <GateValidationForm
-            code={code}
-            onCodeChange={setCode}
-            submitting={submitting}
-            onSubmit={handleLookup}
-            inputRef={inputRef}
-            submitLabel="Buscar sessão"
-            submittingLabel="Buscando..."
-          />
+          <>
+            <div className="flex gap-2.5">
+              <button
+                type="button"
+                onClick={() => setInputMode("scan")}
+                className={`flex-1 rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+                  inputMode === "scan"
+                    ? "bg-accent-lime text-[#05070a]"
+                    : "border border-border bg-surface text-text-dim hover:border-text-mute"
+                }`}
+              >
+                Escanear código
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputMode("manual")}
+                className={`flex-1 rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+                  inputMode === "manual"
+                    ? "bg-accent-lime text-[#05070a]"
+                    : "border border-border bg-surface text-text-dim hover:border-text-mute"
+                }`}
+              >
+                Digitar código
+              </button>
+            </div>
+
+            {inputMode === "scan" ? (
+              <QrCodeScanner onDetect={handleLookup} paused={submitting} />
+            ) : (
+              <GateValidationForm
+                code={code}
+                onCodeChange={setCode}
+                submitting={submitting}
+                onSubmit={handleLookup}
+                inputRef={inputRef}
+                submitLabel="Buscar sessão"
+                submittingLabel="Buscando..."
+              />
+            )}
+          </>
         )}
 
         {result && <ValidationResult response={result} />}
