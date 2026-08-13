@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { appRoutes } from "@/config/routes";
 import { SessionTimeButton } from "@/features/events/SessionTimeButton";
 import { ApiError } from "@/lib/api-client";
-import { formatEventTime, formatSessionDateLabel } from "@/lib/format";
+import { formatEventTime, formatSessionDateParts } from "@/lib/format";
 import { groupSessionsByDateAndVenue } from "@/lib/group-events";
 import { venueLabels } from "@/lib/venue";
 import { getPublishedEvent, listPublishedEvents } from "@/services/public-events";
@@ -141,18 +141,22 @@ export default function EventDetailsPage() {
             <div className="mb-6 flex flex-wrap gap-2.5">
               {dateGroups.map((dateGroup) => {
                 const isActive = dateGroup.dateKey === activeDateGroup?.dateKey;
+                const { weekday, dayMonth } = formatSessionDateParts(
+                  dateGroup.venues[0].sessions[0].startsAt,
+                );
                 return (
                   <button
                     key={dateGroup.dateKey}
                     type="button"
                     onClick={() => setSelectedDateKey(dateGroup.dateKey)}
-                    className={`cursor-pointer rounded-[9px] px-4.5 py-2.5 text-[13px] font-bold transition-colors ${
+                    className={`flex cursor-pointer flex-col items-center justify-center rounded-[9px] px-4 py-2 text-[13px] font-bold leading-tight transition-colors ${
                       isActive
                         ? "bg-accent-lime text-[#05070a]"
                         : "border border-border bg-surface text-text-dim hover:border-accent-lime hover:text-foreground"
                     }`}
                   >
-                    {formatSessionDateLabel(dateGroup.venues[0].sessions[0].startsAt)}
+                    <span>{weekday}</span>
+                    <span>{dayMonth}</span>
                   </button>
                 );
               })}
