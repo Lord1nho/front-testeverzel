@@ -70,9 +70,9 @@ export default function SharedTicketPage() {
   return (
     <main className="flex min-h-dvh flex-col items-center px-6 py-16">
       <div className="w-full max-w-md">
-        <span className="mb-8 block font-heading text-lg font-bold">
+        <Link href="/" className="mb-8 block cursor-pointer font-heading text-lg font-bold">
           Cine<span className="text-accent-lime">Verzel</span>
-        </span>
+        </Link>
 
         <div className="mb-5">
           <QrTicket qrValue={ticket.qrValue} />
