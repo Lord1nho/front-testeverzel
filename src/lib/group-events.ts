@@ -30,6 +30,13 @@ export function groupEventsByMovie(events: EventSummary[]): MovieGroup[] {
   return result;
 }
 
+// Um filme cujas sessões já encerraram todas não deve aparecer na vitrine
+// de "Em cartaz" -- usado pra filtrar o resultado de groupEventsByMovie
+// antes de renderizar (carrossel e hero usam o mesmo filtro).
+export function isMovieFullyEnded(group: MovieGroup): boolean {
+  return group.sessions.every((session) => session.sessionStatus === "ENDED");
+}
+
 export interface VenueGroup {
   venue: Venue;
   sessions: EventSummary[];
