@@ -81,41 +81,42 @@ export default function EventDetailsPage() {
   }
 
   return (
-    <main className="min-h-dvh px-10 py-10">
-      <Link
-        href={appRoutes.events}
-        className="mb-8 inline-block text-sm text-text-dim hover:text-foreground"
-      >
-        ← Voltar para eventos
-      </Link>
+    <main className="min-h-dvh">
+      <div className="relative h-[320px] w-full overflow-hidden bg-surface-2 sm:h-[420px]">
+        {event.catalogItem.imageUrl && (
+          <Image
+            src={event.catalogItem.imageUrl}
+            alt={event.catalogItem.title}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-top"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-transparent" />
 
-      <div className="flex flex-col gap-8 lg:flex-row">
-        <div className="w-full max-w-[280px] flex-none overflow-hidden rounded-xl border border-border bg-surface-2">
-          <div className="relative aspect-[2/3] w-full">
-            {event.catalogItem.imageUrl ? (
-              <Image
-                src={event.catalogItem.imageUrl}
-                alt={event.catalogItem.title}
-                fill
-                sizes="280px"
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-xs text-text-mute">
-                Sem imagem
-              </div>
-            )}
-          </div>
-        </div>
+        <Link
+          href={appRoutes.events}
+          className="absolute left-6 top-6 inline-block text-sm text-text-dim hover:text-foreground sm:left-10 sm:top-8"
+        >
+          ← Voltar para eventos
+        </Link>
 
-        <div className="flex-1">
-          <h1 className="mb-2 font-heading text-3xl font-bold">{event.catalogItem.title}</h1>
-          <p className="mb-6 text-sm text-text-dim">
+        <div className="absolute bottom-8 left-6 right-6 sm:bottom-11 sm:left-10 sm:right-10">
+          <h1 className="mb-2 font-heading text-2xl font-bold leading-tight text-foreground sm:text-4xl">
+            {event.catalogItem.title}
+          </h1>
+          <p className="text-sm text-text-dim">
             {event.catalogItem.durationMinutes
               ? `${event.catalogItem.durationMinutes} min`
               : "Duração não informada pela TMDB"}
           </p>
+        </div>
+      </div>
 
+      <div className="px-6 py-8 sm:px-10 sm:py-10">
+        <div className="max-w-3xl">
           {event.catalogItem.description && (
             <p className="mb-8 max-w-xl text-sm leading-6 text-text-dim">
               {event.catalogItem.description}
