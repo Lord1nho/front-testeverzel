@@ -156,7 +156,7 @@ export function PaymentForm({ totalAmount, submitting, error, onSubmit }: Paymen
       <button
         type="submit"
         disabled={submitting}
-        className="mt-6 w-full max-w-md rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-6 w-full max-w-md cursor-pointer rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {submitting ? "Processando..." : `Pagar ${formatCurrency(totalAmount)}`}
       </button>

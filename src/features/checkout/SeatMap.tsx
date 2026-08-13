@@ -51,9 +51,9 @@ export function SeatMap({ seats, selectedIds, onToggle, maxSelectable }: SeatMap
                     title={seat.code}
                     className={`flex h-8 w-8 flex-none items-center justify-center rounded-md border text-[10px] font-semibold transition-colors ${
                       selected
-                        ? "border-accent-lime bg-accent-lime text-[#05070a]"
+                        ? "cursor-pointer border-accent-lime bg-accent-lime text-[#05070a]"
                         : available
-                          ? "border-border bg-surface text-text-dim hover:border-accent-cyan hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                          ? "cursor-pointer border-border bg-surface text-text-dim hover:border-accent-cyan hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                           : "cursor-not-allowed border-border bg-surface-2 text-text-mute opacity-50"
                     }`}
                   >

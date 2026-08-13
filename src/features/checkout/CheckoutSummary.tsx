@@ -88,7 +88,7 @@ export function CheckoutSummary({
           type="button"
           disabled={!hasSelection || submitting || Boolean(blockedReason)}
           onClick={onConfirm}
-          className="w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full cursor-pointer rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? "Reservando..." : "Confirmar reserva"}
         </button>

@@ -125,7 +125,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 type="button"
                 onClick={() => dismiss(toast.id)}
                 aria-label="Fechar"
-                className="flex-none text-text-mute hover:text-foreground"
+                className="flex-none cursor-pointer text-text-mute hover:text-foreground"
               >
                 ×
               </button>

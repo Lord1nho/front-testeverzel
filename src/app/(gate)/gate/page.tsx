@@ -160,7 +160,7 @@ export default function GatePage() {
           </span>
           <span className="text-xs font-medium text-text-mute">Portaria</span>
         </div>
-        <button type="button" onClick={handleLogout} className="text-sm text-text-dim hover:text-foreground">
+        <button type="button" onClick={handleLogout} className="cursor-pointer text-sm text-text-dim hover:text-foreground">
           Sair
         </button>
       </div>
@@ -181,7 +181,7 @@ export default function GatePage() {
               type="button"
               onClick={handleConfirmValidate}
               disabled={submitting}
-              className="mb-2.5 w-full rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mb-2.5 w-full cursor-pointer rounded-[10px] bg-accent-lime py-3.5 text-center text-sm font-bold text-[#05070a] hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? "Validando..." : "Validar ingresso"}
             </button>
@@ -189,7 +189,7 @@ export default function GatePage() {
               type="button"
               onClick={handleCancelLookup}
               disabled={submitting}
-              className="w-full text-center text-sm text-text-dim hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full cursor-pointer text-center text-sm text-text-dim hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               Ler outro código
             </button>
@@ -200,7 +200,7 @@ export default function GatePage() {
               <button
                 type="button"
                 onClick={() => setInputMode("scan")}
-                className={`flex-1 rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+                className={`flex-1 cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
                   inputMode === "scan"
                     ? "bg-accent-lime text-[#05070a]"
                     : "border border-border bg-surface text-text-dim hover:border-text-mute"
@@ -211,7 +211,7 @@ export default function GatePage() {
               <button
                 type="button"
                 onClick={() => setInputMode("manual")}
-                className={`flex-1 rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
+                className={`flex-1 cursor-pointer rounded-[9px] px-4 py-2.5 text-[13px] font-bold transition-colors ${
                   inputMode === "manual"
                     ? "bg-accent-lime text-[#05070a]"
                     : "border border-border bg-surface text-text-dim hover:border-text-mute"
