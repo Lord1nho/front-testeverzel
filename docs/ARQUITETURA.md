@@ -1,6 +1,6 @@
 # CineVerzel — Arquitetura do Frontend (Next.js)
 
-> Documentação estrutural do frontend, baseada exclusivamente no código presente na branch `dev`. Descreve como o projeto está organizado hoje — pastas, módulos, rotas, componentes, comunicação com a API e fluxo de dados — sem propor mudanças.
+> Documentação estrutural do frontend, baseada exclusivamente no código presente na branch `dev` + versão completa para Utilização em ambiente local na branch `master`. Descreve como o projeto está organizado hoje — pastas, módulos, rotas, componentes, comunicação com a API e fluxo de dados — sem propor mudanças.
 
 ## Stack
 
