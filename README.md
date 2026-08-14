@@ -100,3 +100,4 @@ Este repositorio pode registrar apoio de IA na organizacao inicial, documentacao
 - Casos de uso ainda nao implementados.
 - Backend precisa estar disponivel para qualquer chamada real.
 - Credenciais seedadas finais ainda dependem do backend.
+- No login, um e-mail com formato invalido (mas que passa pela validacao nativa do navegador) recebe uma mensagem diferente ("E-mail invalido.", erro de validacao do Zod, 400) da mensagem de senha errada ("Credenciais invalidas.", 401). E um comportamento conhecido e aceito, nao um bug — o formulario ja usa `type="email"`, entao a maioria dos formatos invalidos e barrada pelo proprio navegador antes mesmo de chegar no backend.
