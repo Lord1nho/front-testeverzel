@@ -30,13 +30,13 @@ export function SeatMap({ seats, selectedIds, onToggle, maxSelectable }: SeatMap
         Tela
       </p>
 
-      <div className="flex flex-col items-center gap-2">
+      <div className="custom-scrollbar flex flex-col items-center gap-2 overflow-x-auto px-1 pb-1">
         {rows.map(([row, rowSeats]) => (
           <div key={row} className="flex items-center gap-2">
             <span className="w-4 flex-none text-xs font-semibold text-text-mute">
               {row}
             </span>
-            <div className="flex gap-1.5">
+            <div className="flex gap-1 sm:gap-1.5">
               {rowSeats.map((seat) => {
                 const selected = selectedIds.includes(seat.id);
                 const available = seat.status === "AVAILABLE";
@@ -49,7 +49,7 @@ export function SeatMap({ seats, selectedIds, onToggle, maxSelectable }: SeatMap
                     disabled={disabled}
                     onClick={() => onToggle(seat)}
                     title={seat.code}
-                    className={`flex h-8 w-8 flex-none items-center justify-center rounded-md border text-[10px] font-semibold transition-colors ${
+                    className={`flex h-7 w-7 flex-none items-center justify-center rounded-md border text-[10px] font-semibold transition-colors sm:h-8 sm:w-8 ${
                       selected
                         ? "cursor-pointer border-accent-lime bg-accent-lime text-[#05070a]"
                         : available
