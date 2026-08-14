@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Teste Verzel - Eventos e Ingressos",
+  title: "Cine Verzel",
   description: "Frontend Next.js para a Plataforma de Eventos e Ingressos do teste tecnico Verzel.",
 };
 
