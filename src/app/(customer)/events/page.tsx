@@ -81,9 +81,17 @@ export default function EventsPage() {
                   Meus eventos
                 </Link>
               )}
+              {role === "GATE" && (
+                <Link
+                  href={appRoutes.gate}
+                  className="cursor-pointer rounded-[9px] border border-border bg-surface-2 px-4 py-2 font-semibold text-foreground shadow-sm shadow-black/30 transition-colors hover:border-text-mute hover:bg-border"
+                >
+                  Portaria
+                </Link>
+              )}
               <Link
                 href={appRoutes.profile}
-                className="rounded-[9px] border border-border px-4 py-2 font-semibold text-foreground hover:border-text-mute"
+                className="cursor-pointer rounded-[9px] border border-border bg-surface-2 px-4 py-2 font-semibold text-foreground shadow-sm shadow-black/30 transition-colors hover:border-text-mute hover:bg-border"
               >
                 Perfil
               </Link>
