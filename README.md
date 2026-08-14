@@ -22,7 +22,7 @@ Frontend em Next.js para a Plataforma de Eventos e Ingressos do teste tecnico Ve
 
 ```bash
 npm install
-cp .env.local.example .env.local
+cp .env.local.example .env.local ou copy .env.local.example .env.local 
 npm run dev
 ```
 
