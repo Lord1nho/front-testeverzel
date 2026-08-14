@@ -65,11 +65,14 @@ O token do TMDb pertence somente ao backend. Nao exponha `TMDB_ACCESS_TOKEN` no 
 
 ## Usuarios de Teste
 
-Os usuarios seedados devem ser mantidos no backend e documentados aqui quando as credenciais finais estiverem definidas:
+Usuarios seedados pelo backend (`prisma/seed.ts`), senha `123456` para todos:
 
-- Organizador: `ORGANIZER`
-- Cliente: `CUSTOMER`
-- Portaria: `GATE`
+| Papel | E-mail | Senha | Observacao |
+| --- | --- | --- | --- |
+| Organizador | `organizer@demo.com` | `123456` | `ORGANIZER` |
+| Cliente 1 | `cliente1@demo.com` | `123456` | `CUSTOMER`, ja com 1 ingresso pago |
+| Cliente 2 | `cliente2@demo.com` | `123456` | `CUSTOMER` |
+| Portaria | `portaria@demo.com` | `123456` | `GATE` |
 
 ## Fluxo de Avaliacao
 
@@ -97,7 +100,5 @@ Este repositorio pode registrar apoio de IA na organizacao inicial, documentacao
 
 ## Limitacoes Conhecidas
 
-- Casos de uso ainda nao implementados.
 - Backend precisa estar disponivel para qualquer chamada real.
-- Credenciais seedadas finais ainda dependem do backend.
 - No login, um e-mail com formato invalido (mas que passa pela validacao nativa do navegador) recebe uma mensagem diferente ("E-mail invalido.", erro de validacao do Zod, 400) da mensagem de senha errada ("Credenciais invalidas.", 401). E um comportamento conhecido e aceito, nao um bug — o formulario ja usa `type="email"`, entao a maioria dos formatos invalidos e barrada pelo proprio navegador antes mesmo de chegar no backend.
