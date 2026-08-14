@@ -72,9 +72,9 @@ export default function OrganizerEventsPage() {
 
   return (
     <main className="min-h-dvh">
-      <div className="flex items-center justify-between border-b border-border px-10 py-5">
-        <div className="flex items-center gap-9">
-          <Link href="/" className="cursor-pointer font-heading text-2xl font-bold tracking-tight">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-4 py-4 sm:px-6 lg:px-10 lg:py-5">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-9">
+          <Link href="/" className="cursor-pointer font-heading text-xl font-bold tracking-tight sm:text-2xl">
             Cine<span className="text-accent-lime">Verzel</span>
           </Link>
           <nav className="flex items-center gap-7 text-sm text-text-dim">
@@ -82,7 +82,7 @@ export default function OrganizerEventsPage() {
             <span>Relatórios</span>
           </nav>
         </div>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex flex-wrap items-center gap-3 text-sm">
           <Link
             href={appRoutes.profile}
             className="cursor-pointer rounded-[9px] border border-border bg-surface-2 px-4 py-2 font-semibold text-foreground shadow-sm shadow-black/30 transition-colors hover:border-text-mute hover:bg-border"
@@ -105,7 +105,7 @@ export default function OrganizerEventsPage() {
         </div>
       </div>
 
-      <div className="px-10 py-10">
+      <div className="px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
         <h1 className="mb-5 font-heading text-2xl font-bold">Meus eventos</h1>
 
         <div className="mb-6 flex gap-2.5">
@@ -140,72 +140,74 @@ export default function OrganizerEventsPage() {
         )}
 
         {events && now !== null && (
-          <div className="overflow-hidden rounded-xl border border-border">
-            <div className="grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] gap-2 border-b border-border bg-surface px-5 py-3.5 text-xs font-semibold text-text-mute">
-              <span>Evento</span>
-              <span>Data</span>
-              <span>Cinema / Sala</span>
-              <span>Capacidade</span>
-              <span>Preço</span>
-              <span>Status</span>
-              <span />
-            </div>
+          <div className="custom-scrollbar overflow-x-auto rounded-xl border border-border">
+            <div className="min-w-[720px]">
+              <div className="grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] gap-2 border-b border-border bg-surface px-5 py-3.5 text-xs font-semibold text-text-mute">
+                <span>Evento</span>
+                <span>Data</span>
+                <span>Cinema / Sala</span>
+                <span>Capacidade</span>
+                <span>Preço</span>
+                <span>Status</span>
+                <span />
+              </div>
 
-            {events.map((event) => {
-              const statusLabel = getStatusLabel(event);
-              const editable = new Date(event.startsAt).getTime() > now;
+              {events.map((event) => {
+                const statusLabel = getStatusLabel(event);
+                const editable = new Date(event.startsAt).getTime() > now;
 
-              return (
-                <div
-                  key={event.id}
-                  className={`grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] items-center gap-2 border-b border-border px-5 py-4 text-sm last:border-b-0 ${
-                    editable ? "" : "opacity-55"
-                  }`}
-                >
-                  <span className="font-semibold">{event.title}</span>
-                  <span className="text-text-dim">
-                    {formatEventDateTime(event.startsAt)}
-                  </span>
-                  <span className="text-text-dim">
-                    {venueLabels[event.venue]} · Sala {event.room}
-                  </span>
-                  <span className="text-text-dim">
-                    {event.seatsAvailable} / {event.capacity}
-                  </span>
-                  <span className="text-text-dim">
-                    {formatCurrency(event.price)}
-                  </span>
-                  <span
-                    className={`w-fit rounded-md px-2.5 py-1 text-xs font-bold ${statusClassName[statusLabel]}`}
+                return (
+                  <div
+                    key={event.id}
+                    className={`grid grid-cols-[1.8fr_1.4fr_1.3fr_0.9fr_0.9fr_1fr_0.8fr] items-center gap-2 border-b border-border px-5 py-4 text-sm last:border-b-0 ${
+                      editable ? "" : "opacity-55"
+                    }`}
                   >
-                    {statusLabel}
-                  </span>
-                  {tab === "all" ? (
-                    <Link
-                      href={appRoutes.checkout(event.id)}
-                      className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
+                    <span className="font-semibold">{event.title}</span>
+                    <span className="text-text-dim">
+                      {formatEventDateTime(event.startsAt)}
+                    </span>
+                    <span className="text-text-dim">
+                      {venueLabels[event.venue]} · Sala {event.room}
+                    </span>
+                    <span className="text-text-dim">
+                      {event.seatsAvailable} / {event.capacity}
+                    </span>
+                    <span className="text-text-dim">
+                      {formatCurrency(event.price)}
+                    </span>
+                    <span
+                      className={`w-fit rounded-md px-2.5 py-1 text-xs font-bold ${statusClassName[statusLabel]}`}
                     >
-                      Ver
-                    </Link>
-                  ) : editable ? (
-                    <Link
-                      href={appRoutes.organizerEventDetails(event.id)}
-                      className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
-                    >
-                      Editar
-                    </Link>
-                  ) : (
-                    <span className="text-sm text-text-mute">—</span>
-                  )}
-                </div>
-              );
-            })}
+                      {statusLabel}
+                    </span>
+                    {tab === "all" ? (
+                      <Link
+                        href={appRoutes.checkout(event.id)}
+                        className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
+                      >
+                        Ver
+                      </Link>
+                    ) : editable ? (
+                      <Link
+                        href={appRoutes.organizerEventDetails(event.id)}
+                        className="text-sm font-semibold text-accent-cyan hover:text-accent-lime"
+                      >
+                        Editar
+                      </Link>
+                    ) : (
+                      <span className="text-sm text-text-mute">—</span>
+                    )}
+                  </div>
+                );
+              })}
 
-            {events.length === 0 && (
-              <p className="px-5 py-8 text-center text-sm text-text-dim">
-                Nenhum evento criado ainda.
-              </p>
-            )}
+              {events.length === 0 && (
+                <p className="px-5 py-8 text-center text-sm text-text-dim">
+                  Nenhum evento criado ainda.
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>

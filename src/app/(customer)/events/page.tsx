@@ -53,16 +53,16 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-dvh">
-      <div className="flex items-center justify-between border-b border-border px-10 py-5">
-        <div className="flex items-center gap-9">
-          <Link href="/" className="cursor-pointer font-heading text-2xl font-bold tracking-tight">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-4 py-4 sm:px-6 lg:px-10 lg:py-5">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-9">
+          <Link href="/" className="cursor-pointer font-heading text-xl font-bold tracking-tight sm:text-2xl">
             Cine<span className="text-accent-lime">Verzel</span>
           </Link>
           <nav className="text-sm text-text-dim">
             <span className="font-semibold text-foreground">Filmes</span>
           </nav>
         </div>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex flex-wrap items-center gap-3 text-sm">
           {isAuthenticated === true && (
             <>
               {role === "CUSTOMER" && (
@@ -117,7 +117,7 @@ export default function EventsPage() {
 
       {heroEvent && <EventHero event={heroEvent} />}
 
-      <div className="px-10 py-10">
+      <div className="px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
         <h2 className="mb-5 font-heading text-2xl font-bold">Em cartaz</h2>
 
         {error && (
@@ -137,7 +137,7 @@ export default function EventsPage() {
         )}
 
         {movieGroups && movieGroups.length > 0 && (
-          <div className="custom-scrollbar -mx-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-10 pb-3">
+          <div className="custom-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
             {movieGroups.map((group) => (
               <div key={group.catalogItem.id} className="snap-start">
                 <MovieCard group={group} />

@@ -57,6 +57,7 @@ export function EventForm({ eventId }: EventFormProps) {
   const [price, setPrice] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (!eventId) return;
@@ -96,6 +97,15 @@ export function EventForm({ eventId }: EventFormProps) {
 
     return () => clearTimeout(handle);
   }, [query, isEditMode]);
+
+  useEffect(() => {
+    if (!showDeleteConfirm) return;
+    function handleKeyDown(event: globalThis.KeyboardEvent) {
+      if (event.key === "Escape") setShowDeleteConfirm(false);
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showDeleteConfirm]);
 
   async function handleSelectMovie(summary: MovieSummary) {
     setSelectedMovie(null);
@@ -247,12 +257,13 @@ export function EventForm({ eventId }: EventFormProps) {
     }
   }
 
-  async function handleDelete() {
+  function handleDelete() {
     if (!eventId) return;
-    const confirmed = window.confirm(
-      "Excluir este evento? Essa ação não pode ser desfeita.",
-    );
-    if (!confirmed) return;
+    setShowDeleteConfirm(true);
+  }
+
+  async function confirmDelete() {
+    if (!eventId) return;
 
     setSubmitting(true);
     setError(null);
@@ -265,12 +276,13 @@ export function EventForm({ eventId }: EventFormProps) {
         err instanceof ApiError ? err.message : "Não foi possível excluir o evento.",
       );
       setSubmitting(false);
+      setShowDeleteConfirm(false);
     }
   }
 
   if (loading) {
     return (
-      <div className="p-10">
+      <div className="p-4 sm:p-6 lg:p-10">
         <p className="text-sm text-text-dim">Carregando evento...</p>
       </div>
     );
@@ -278,7 +290,7 @@ export function EventForm({ eventId }: EventFormProps) {
 
   if (loadError) {
     return (
-      <div className="p-10">
+      <div className="p-4 sm:p-6 lg:p-10">
         <p className="text-sm text-text-dim">{loadError}</p>
       </div>
     );
@@ -286,7 +298,7 @@ export function EventForm({ eventId }: EventFormProps) {
 
   if (locked && event) {
     return (
-      <div className="p-10">
+      <div className="p-4 sm:p-6 lg:p-10">
         <p className="text-sm text-text-dim">
           Este evento já foi encerrado e não pode mais ser editado.
         </p>
@@ -300,7 +312,7 @@ export function EventForm({ eventId }: EventFormProps) {
   const reviewImage = isEditMode ? event?.catalogItem.imageUrl : selectedMovie?.posterUrl;
 
   return (
-    <div className="flex gap-8 p-10">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 lg:flex-row lg:gap-8 lg:p-10">
       <div className="flex-1">
         {isEditMode ? (
           <>
@@ -349,7 +361,7 @@ export function EventForm({ eventId }: EventFormProps) {
             {moviesLoading ? (
               <p className="mb-8 text-sm text-text-dim">Carregando catálogo...</p>
             ) : (
-              <div className="mb-8 grid grid-cols-3 gap-4">
+              <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {movies.map((movie) => (
                   <button
                     key={movie.tmdbId}
@@ -385,7 +397,7 @@ export function EventForm({ eventId }: EventFormProps) {
                   </button>
                 ))}
                 {movies.length === 0 && (
-                  <p className="col-span-3 text-sm text-text-dim">
+                  <p className="col-span-full text-sm text-text-dim">
                     Nenhum resultado para essa busca.
                   </p>
                 )}
@@ -397,7 +409,7 @@ export function EventForm({ eventId }: EventFormProps) {
         <h3 className="mb-4 font-heading text-base font-semibold">
           {isEditMode ? "Configurar evento" : "2. Configurar evento"}
         </h3>
-        <div className="grid max-w-xl grid-cols-2 gap-4">
+        <div className="grid max-w-xl grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-xs text-text-mute">
               Data e hora
@@ -499,7 +511,7 @@ export function EventForm({ eventId }: EventFormProps) {
         </div>
       </div>
 
-      <div className="w-80 flex-none self-start rounded-2xl border border-border bg-surface p-6">
+      <div className="w-full self-start rounded-2xl border border-border bg-surface p-6 lg:w-80 lg:flex-none">
         <h3 className="mb-4 font-heading text-base font-semibold">Revisão</h3>
         {reviewTitle ? (
           <>
@@ -581,6 +593,47 @@ export function EventForm({ eventId }: EventFormProps) {
           </>
         )}
       </div>
+
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => !submitting && setShowDeleteConfirm(false)}
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-event-title"
+            aria-describedby="delete-event-description"
+            onClick={(event) => event.stopPropagation()}
+            className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6 text-center shadow-lg shadow-black/40"
+          >
+            <h2 id="delete-event-title" className="mb-2 font-heading text-lg font-bold">
+              Excluir evento
+            </h2>
+            <p id="delete-event-description" className="mb-6 text-sm text-text-dim">
+              Excluir este evento? Essa ação não pode ser desfeita.
+            </p>
+            <div className="flex flex-col gap-2.5 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={submitting}
+                className="w-full cursor-pointer rounded-[10px] border border-border bg-surface-2 py-3 text-center text-sm font-semibold text-foreground hover:bg-border disabled:cursor-not-allowed disabled:opacity-60 sm:flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={submitting}
+                className="w-full cursor-pointer rounded-[10px] border border-red-500/30 bg-red-500/10 py-3 text-center text-sm font-semibold text-red-400 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-1"
+              >
+                {submitting ? "Excluindo..." : "Excluir evento"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

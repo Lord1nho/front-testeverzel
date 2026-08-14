@@ -291,7 +291,7 @@ export default function CheckoutPage() {
 
   if (reservation) {
     return (
-      <main className="min-h-dvh px-10 py-10">
+      <main className="min-h-dvh px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
         <button
           type="button"
           onClick={handleBackFromPayment}
@@ -333,7 +333,7 @@ export default function CheckoutPage() {
             onSubmit={handlePay}
           />
 
-          <div className="w-80 flex-none self-start rounded-2xl border border-border bg-surface p-6">
+          <div className="w-full self-start rounded-2xl border border-border bg-surface p-6 lg:w-80 lg:flex-none">
             <h3 className="mb-4 font-heading text-base font-semibold">Resumo do pedido</h3>
             <div className="mb-2 flex justify-between text-sm">
               <span className="text-text-mute">Evento</span>
@@ -382,7 +382,7 @@ export default function CheckoutPage() {
   const selectedSeats = seats.filter((seat) => selectedIds.includes(seat.id));
 
   return (
-    <main className="min-h-dvh px-10 py-10">
+    <main className="min-h-dvh px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
       <Link
         href={appRoutes.eventDetails(event.id)}
         className="mb-8 inline-block text-sm text-text-dim hover:text-foreground"
