@@ -1,8 +1,13 @@
 # front-testeverzel
 
+## 🔗 Repositórios
+
+### [Frontend — front-testeverzel](https://github.com/Lord1nho/front-testeverzel)
+### [Backend — backend-testeverzel](https://github.com/Lord1nho/backend-testeverzel)
+
 Frontend em Next.js para a Plataforma de Eventos e Ingressos do teste técnico Verzel.
 
->  **[Acessar aplicação em produção](https://vzel-cinema.vercel.app/)**
+> **[Acessar aplicação em produção](https://vzel-cinema.vercel.app/)**
 
 ### ⚠️ Observação sobre o ambiente de produção
 
