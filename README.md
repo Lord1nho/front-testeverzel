@@ -1,32 +1,43 @@
 # front-testeverzel
 
-Frontend em Next.js para a Plataforma de Eventos e Ingressos do teste tecnico Verzel.
+Frontend em Next.js para a Plataforma de Eventos e Ingressos do teste técnico Verzel.
 
-> **Branch para rodar localmente:** use a `master`. E a branch estavel e atualizada do projeto — as instrucoes de instalacao e execucao abaixo partem dela.
+>  **[Acessar aplicação em produção](https://vzel-cinema.vercel.app/)**
+
+### ⚠️ Observação sobre o ambiente de produção
+
+A aplicação frontend está publicada na **Vercel** e o backend está hospedado no **Render**.
+
+Como o backend pode entrar em modo de *sleep* após um período de inatividade, **a primeira requisição pode levar alguns segundos a mais para responder**. Caso a aplicação pareça estar carregando por mais tempo no primeiro acesso ou após um período sem utilização, aguarde alguns instantes e tente novamente. As requisições seguintes tendem a responder normalmente após o backend ser reativado.
+
+> **Branch para rodar localmente:** use a `master`. É a branch estável e atualizada do projeto — as instruções de instalação e execução abaixo partem dela.
 
 ## Stack
 
-- Next.js com App Router
-- TypeScript
-- Tailwind CSS
-- ESLint
-- API HTTP externa em Express
+* Next.js com App Router
+* TypeScript
+* Tailwind CSS
+* ESLint
+* API HTTP externa em Express
 
 ## Requisitos
 
-- Node.js 22 ou superior
-- npm
-- Backend Express rodando localmente
+* Node.js 22 ou superior
+* npm
+* Backend Express rodando localmente
 
-## Instalacao
+## Instalação
 
 ```bash
 npm install
-cp .env.local.example .env.local ou copy .env.local.example .env.local 
+cp .env.local.example .env.local
+# No Windows:
+# copy .env.local.example .env.local
+
 npm run dev
 ```
 
-No Windows PowerShell, se `npm` for bloqueado pela politica de scripts, use:
+No Windows PowerShell, se `npm` for bloqueado pela política de scripts, use:
 
 ```bash
 npm.cmd install
@@ -41,66 +52,66 @@ Crie `.env.local` a partir de `.env.local.example`:
 NEXT_PUBLIC_API_URL=http://localhost:3333
 ```
 
-O token do TMDb pertence somente ao backend. Nao exponha `TMDB_ACCESS_TOKEN` no frontend.
+O token do TMDb pertence somente ao backend. Não exponha `TMDB_ACCESS_TOKEN` no frontend.
 
 ## Estrutura Inicial
 
-- `src/app`: rotas do App Router, organizadas por route groups.
-- `src/lib/api-client.ts`: cliente HTTP central para chamadas ao backend.
-- `src/config/routes.ts`: mapa central das rotas planejadas.
-- `src/features`: modulos por dominio.
-- `src/components`: componentes compartilhados.
-- `src/types`: tipos globais do frontend.
+* `src/app`: rotas do App Router, organizadas por route groups.
+* `src/lib/api-client.ts`: cliente HTTP central para chamadas ao backend.
+* `src/config/routes.ts`: mapa central das rotas planejadas.
+* `src/features`: módulos por domínio.
+* `src/components`: componentes compartilhados.
+* `src/types`: tipos globais do frontend.
 
 ## Rotas Planejadas
 
-- `/login`
-- `/events`
-- `/events/[id]`
-- `/checkout/[eventId]`
-- `/my-tickets`
-- `/tickets/[code]`
-- `/organizer/events`
-- `/organizer/events/new`
-- `/organizer/events/[id]`
-- `/gate`
+* `/login`
+* `/events`
+* `/events/[id]`
+* `/checkout/[eventId]`
+* `/my-tickets`
+* `/tickets/[code]`
+* `/organizer/events`
+* `/organizer/events/new`
+* `/organizer/events/[id]`
+* `/gate`
 
-## Usuarios de Teste
+## Usuários de Teste
 
-Usuarios seedados pelo backend (`prisma/seed.ts`), senha `123456` para todos:
+Usuários seedados pelo backend (`prisma/seed.ts`), senha `123456` para todos:
 
-| Papel | E-mail | Senha | Observacao |
-| --- | --- | --- | --- |
-| Organizador | `organizer@demo.com` | `123456` | `ORGANIZER` |
-| Cliente 1 | `cliente1@demo.com` | `123456` | `CUSTOMER`, ja com 1 ingresso pago |
-| Cliente 2 | `cliente2@demo.com` | `123456` | `CUSTOMER` |
-| Portaria | `portaria@demo.com` | `123456` | `GATE` |
+| Papel       | E-mail               | Senha    | Observação                         |
+| ----------- | -------------------- | -------- | ---------------------------------- |
+| Organizador | `organizer@demo.com` | `123456` | `ORGANIZER`                        |
+| Cliente 1   | `cliente1@demo.com`  | `123456` | `CUSTOMER`, já com 1 ingresso pago |
+| Cliente 2   | `cliente2@demo.com`  | `123456` | `CUSTOMER`                         |
+| Portaria    | `portaria@demo.com`  | `123456` | `GATE`                             |
 
-## Fluxo de Avaliacao
+## Fluxo de Avaliação
 
 Quando os casos de uso forem implementados, validar:
 
-- login por papel;
-- listagem e busca de eventos publicados;
-- compra aprovada;
-- compra recusada;
-- meus ingressos;
-- visualizacao de QR Code ou codigo do ingresso;
-- validacao pela portaria;
-- responsividade basica.
+* login por papel;
+* listagem e busca de eventos publicados;
+* compra aprovada;
+* compra recusada;
+* meus ingressos;
+* visualização de QR Code ou código do ingresso;
+* validação pela portaria;
+* responsividade básica.
 
-## Decisoes de UI
+## Decisões de UI
 
-- Primeira experiencia deve parecer produto, nao landing page generica.
-- Telas devem priorizar tarefa, leitura rapida e estados claros.
-- O mapa de assentos deve ter legenda sempre visivel.
-- A portaria deve apresentar retorno de validacao muito evidente.
+* Primeira experiência deve parecer produto, não landing page genérica.
+* Telas devem priorizar tarefa, leitura rápida e estados claros.
+* O mapa de assentos deve ter legenda sempre visível.
+* A portaria deve apresentar retorno de validação muito evidente.
 
 ## Uso de IA
 
-Este repositorio pode registrar apoio de IA na organizacao inicial, documentacao e implementacao assistida. As decisoes finais de escopo, comportamento e validacao devem permanecer documentadas no projeto.
+Este repositório pode registrar apoio de IA na organização inicial, documentação e implementação assistida. As decisões finais de escopo, comportamento e validação devem permanecer documentadas no projeto.
 
-## Limitacoes Conhecidas
+## Limitações Conhecidas
 
-- Backend precisa estar disponivel para qualquer chamada real.
-- No login, um e-mail com formato invalido (mas que passa pela validacao nativa do navegador) recebe uma mensagem diferente ("E-mail invalido.", erro de validacao do Zod, 400) da mensagem de senha errada ("Credenciais invalidas.", 401). E um comportamento conhecido e aceito, nao um bug — o formulario ja usa `type="email"`, entao a maioria dos formatos invalidos e barrada pelo proprio navegador antes mesmo de chegar no backend.
+* Backend precisa estar disponível para qualquer chamada real.
+* No login, um e-mail com formato inválido (mas que passa pela validação nativa do navegador) recebe uma mensagem diferente ("E-mail inválido.", erro de validação do Zod, 400) da mensagem de senha errada ("Credenciais inválidas.", 401). É um comportamento conhecido e aceito, não um bug — o formulário já usa `type="email"`, então a maioria dos formatos inválidos é barrada pelo próprio navegador antes mesmo de chegar no backend.
