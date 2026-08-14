@@ -2,6 +2,8 @@
 
 Frontend em Next.js para a Plataforma de Eventos e Ingressos do teste tecnico Verzel.
 
+> **Branch para rodar localmente:** use a `master`. E a branch estavel e atualizada do projeto — as instrucoes de instalacao e execucao abaixo partem dela.
+
 ## Stack
 
 - Next.js com App Router
