@@ -5,8 +5,8 @@ import { EventForm } from "@/features/organizer/EventForm";
 export default function NewOrganizerEventPage() {
   return (
     <main className="min-h-dvh">
-      <div className="flex items-center justify-between border-b border-border px-10 py-5">
-        <div className="flex items-center gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-4 sm:px-6 lg:px-10 lg:py-5">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-5">
           <Link
             href={appRoutes.organizerEvents}
             className="text-sm text-text-dim hover:text-foreground"

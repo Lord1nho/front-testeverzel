@@ -76,7 +76,7 @@ export function PaymentForm({ totalAmount, submitting, error, onSubmit }: Paymen
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex-1 rounded-2xl border border-border bg-surface p-8"
+      className="flex-1 rounded-2xl border border-border bg-surface p-4 sm:p-6 lg:p-8"
     >
       <h3 className="mb-1.5 font-heading text-base font-semibold">Cartão de crédito</h3>
       <p className="mb-6 text-xs text-text-mute">

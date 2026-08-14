@@ -31,7 +31,7 @@ export function CheckoutSummary({
   const hasSelection = selectedSeats.length > 0;
 
   return (
-    <div className="w-80 flex-none self-start rounded-2xl border border-border bg-surface p-6">
+    <div className="w-full self-start rounded-2xl border border-border bg-surface p-6 lg:w-80 lg:flex-none">
       <h3 className="mb-1.5 font-heading text-base font-semibold">{eventTitle}</h3>
       <span className="mb-4 block text-xs text-text-mute">
         {eventDateTime} · {venueLabel} · Sala {room}

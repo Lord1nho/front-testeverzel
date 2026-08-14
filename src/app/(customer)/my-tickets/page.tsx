@@ -94,16 +94,16 @@ export default function MyTicketsPage() {
 
   return (
     <main className="min-h-dvh">
-      <div className="flex items-center justify-between border-b border-border px-10 py-5">
-        <div className="flex items-center gap-9">
-          <Link href="/" className="cursor-pointer font-heading text-2xl font-bold tracking-tight">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-4 py-4 sm:px-6 lg:px-10 lg:py-5">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-9">
+          <Link href="/" className="cursor-pointer font-heading text-xl font-bold tracking-tight sm:text-2xl">
             Cine<span className="text-accent-lime">Verzel</span>
           </Link>
           <nav className="text-sm text-text-dim">
             <span className="font-semibold text-foreground">Meus ingressos</span>
           </nav>
         </div>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex flex-wrap items-center gap-3 text-sm">
           <Link
             href={appRoutes.events}
             className="cursor-pointer rounded-[9px] border border-border bg-surface-2 px-4 py-2 font-semibold text-foreground shadow-sm shadow-black/30 transition-colors hover:border-text-mute hover:bg-border"
@@ -126,7 +126,7 @@ export default function MyTicketsPage() {
         </div>
       </div>
 
-      <div className="px-10 py-10">
+      <div className="px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
         <h1 className="mb-6 font-heading text-2xl font-bold">Meus ingressos</h1>
 
         <div className="mb-7 flex gap-2.5">

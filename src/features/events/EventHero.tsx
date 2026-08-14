@@ -16,7 +16,7 @@ export function EventHero({ event }: { event: EventSummary }) {
   const badgeLabel = soldOut ? "Esgotado" : sessionStatusLabel[event.sessionStatus];
 
   return (
-    <div className="relative h-[420px] w-full overflow-hidden bg-surface-2">
+    <div className="relative h-[320px] w-full overflow-hidden bg-surface-2 sm:h-[420px]">
       {event.catalogItem.imageUrl && (
         <Image
           src={event.catalogItem.imageUrl}
@@ -30,7 +30,7 @@ export function EventHero({ event }: { event: EventSummary }) {
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/75 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
-      <div className="absolute bottom-11 left-10 max-w-lg">
+      <div className="absolute bottom-8 left-6 max-w-lg pr-6 sm:bottom-11 sm:left-10 sm:pr-0">
         <span
           className={`mb-4 inline-block rounded-md px-2.5 py-1 text-xs font-bold ${
             soldOut
@@ -40,7 +40,7 @@ export function EventHero({ event }: { event: EventSummary }) {
         >
           {badgeLabel}
         </span>
-        <h1 className="mb-2.5 font-heading text-4xl font-bold leading-tight text-foreground">
+        <h1 className="mb-2.5 font-heading text-2xl font-bold leading-tight text-foreground sm:text-4xl">
           {event.title}
         </h1>
         <p className="mb-5 text-sm text-text-dim">
